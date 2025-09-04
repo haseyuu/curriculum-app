@@ -61,16 +61,23 @@
         <div class="sidebar">
             <h4 class="text-center">メニュー</h4>
             <ul class="nav flex-column">
-                <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ url('/posts') }}" class="nav-link">投稿一覧</a></li>
-                <li class="nav-item"><a href="{{ url('/tags') }}" class="nav-link">タグ</a></li>
-                <li class="nav-item"><a href="{{ url('/favorites') }}" class="nav-link">お気に入り</a></li>
+                <li class="nav-item"><a href="{{ url('/mypage') }}" class="nav-link">ホーム</a></li>
+                <li class="nav-item"><a href="{{ url('/post') }}" class="nav-link">投稿</a></li>
+                <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>
+                <li class="nav-item"><a href="{{ url('/logout') }}" class="nav-link">ログアウト</a></li>
             </ul>
         </div>
 
         <!-- ✅ メインコンテンツ -->
         <div class="content">
-            @yield('content')
+            <div class="card-body">
+                @yield('content')
+            </div>
+            @for($i=0;$i<5;$i++)
+            <div class="card-body">
+                test
+            </div>
+            @endfor
         </div>
     </div>
 

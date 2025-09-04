@@ -27,20 +27,8 @@
         width: 100%;
         z-index: 1000;
     }
-    /* サイドバー */
-    .sidebar {
-        width: 15vw;
-        height: 100vh;
-        position: fixed;
-        top: 56px;
-        left: 0;
-        background-color: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-        padding: 20px 10px;
-    }
     /* メインコンテンツ */
     .content {
-        margin-left: 15vw;
         margin-top: 56px;
         padding: 20px;
     }
@@ -56,18 +44,6 @@
                 </a>
             </div>
         </nav>
-       <div id="app">
-        <!-- ✅ サイドバー -->
-        <div class="sidebar">
-            <h4 class="text-center">メニュー</h4>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ url('/posts') }}" class="nav-link">投稿一覧</a></li>
-                <li class="nav-item"><a href="{{ url('/tags') }}" class="nav-link">タグ</a></li>
-                <li class="nav-item"><a href="{{ url('/favorites') }}" class="nav-link">お気に入り</a></li>
-            </ul>
-        </div>
-
         <!-- ✅ メインコンテンツ -->
         <div class="content">
             @yield('content')
