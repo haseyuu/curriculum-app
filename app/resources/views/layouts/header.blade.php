@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', '家計簿') }}</title>
+    <title>{{ config('app.name', '') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -19,7 +19,6 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <style>
-   /* 固定ヘッダー */
     .navbar {
         position: fixed;
         top: 0;
@@ -27,7 +26,6 @@
         width: 100%;
         z-index: 1000;
     }
-    /* メインコンテンツ */
     .content {
         margin-top: 56px;
         padding: 20px;
@@ -44,13 +42,11 @@
                 </a>
             </div>
         </nav>
-        <!-- ✅ メインコンテンツ -->
         <div class="content">
             @yield('content')
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

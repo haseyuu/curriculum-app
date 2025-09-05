@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', '家計簿') }}</title>
+    <title>{{ config('app.name', '') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -19,7 +19,6 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <style>
-   /* 固定ヘッダー */
     .navbar {
         position: fixed;
         top: 0;
@@ -27,7 +26,6 @@
         width: 100%;
         z-index: 1000;
     }
-    /* サイドバー */
     .sidebar {
         width: 15vw;
         height: 100vh;
@@ -38,7 +36,6 @@
         border-right: 1px solid #dee2e6;
         padding: 20px 10px;
     }
-    /* メインコンテンツ */
     .content {
         margin-left: 15vw;
         margin-top: 56px;
@@ -57,18 +54,16 @@
             </div>
         </nav>
        <div id="app">
-        <!-- ✅ サイドバー -->
         <div class="sidebar">
             <h4 class="text-center">メニュー</h4>
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="{{ url('/mypage') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ url('/post') }}" class="nav-link">投稿</a></li>
+                <li class="nav-item"><a href="{{ url('/posting') }}" class="nav-link">投稿</a></li>
                 <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>
                 <li class="nav-item"><a href="{{ url('/logout') }}" class="nav-link">ログアウト</a></li>
             </ul>
         </div>
 
-        <!-- ✅ メインコンテンツ -->
         <div class="content">
             <div class="card-body">
                 @yield('content')
@@ -81,7 +76,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

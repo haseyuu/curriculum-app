@@ -22,8 +22,11 @@ Route::get('/login', function () {
     return view('login');
 })->name('login');
 Route::get('/pass_reset', function () {
-    return view('pass_reset');
+    return view('email_form');
 })->name('pass_reset');
+Route::get('/email_change', function () {
+    return view('email_form');
+})->name('email_change');
 Route::post('/reset_conf', function () {
     return view('reset_confirm');
 })->name('reset_conf');
@@ -45,3 +48,12 @@ Route::post('/regist_confirm', function () {
 Route::post('/regist_complete', function () {
     return view('regist_complete');
 })->name('regist_complete');
+Route::get('/posting', function () {
+    return view('post_form');
+})->name('posting');
+Route::get('/search', function () {
+    return view('search');
+})->name('search');
+Route::get('/profile_edit', function () {
+    return view('profile_edit');
+})->name('profile_edit');

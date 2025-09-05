@@ -24,8 +24,6 @@
                                 value="{{old('user_name'?? '')}}" placeholder="*ユーザー名"><br>
                             <input type="text" class='form-control' name='user_id'
                                 value="{{old('user_id'?? '')}}" placeholder="ユーザーID"><br>
-                            <input type="email" class='form-control' name='email'
-                                value="{{old('email'?? '')}}" placeholder="*メールアドレス"><br>
                             <input type="password" class='form-control' name='password'
                                 placeholder="*パスワード"><br>
                             <input type="password" class='form-control' name='password_confirm'
