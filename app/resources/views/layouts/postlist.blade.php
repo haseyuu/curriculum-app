@@ -70,7 +70,9 @@
             </div>
             @for($i=0;$i<5;$i++)
             <div class="card-body">
-                test
+                <div class="card p-4">
+                    test
+                </div>
             </div>
             @endfor
         </div>

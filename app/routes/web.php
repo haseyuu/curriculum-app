@@ -18,6 +18,10 @@ Route::get('/', function () {
     return view('main');
     //return view('welcome');
 })->name('/');
+Route::get('admin', function () {
+    return view('admin');
+    //return view('welcome');
+})->name('admin');
 Route::get('/login', function () {
     return view('login');
 })->name('login');
@@ -30,6 +34,12 @@ Route::get('/email_change', function () {
 Route::post('/reset_conf', function () {
     return view('reset_confirm');
 })->name('reset_conf');
+Route::get('/follow', function () {
+    return view('user.follows');
+})->name('follow');
+Route::get('/user_page', function () {
+    return view('user.user_page');
+})->name('user_page');
 Route::get('/reset_form', function () {
     return view('reset_form');
 })->name('reset_form');
