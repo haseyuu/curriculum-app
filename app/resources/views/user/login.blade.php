@@ -25,13 +25,13 @@
                             <label for="user_info" class='mt-2'>パスワード</label>
                                 <input type="password" class='form-control' name='password'
                                 value="{{old('password'?? '')}}">
-                            <a href="{{route('pass_reset')}}">パスワードを忘れた方はこちら</a><br>
+                            <a href="{{route('resetEmail')}}">パスワードを忘れた方はこちら</a><br>
                             <div class='row justify-content-center'>
                                 <button type='submit' class='btn btn-primary w-25 mt-3'>ログイン</button>
                             </div>
                         </form><br>
                         <div class='row justify-content-center'>
-                            <a href="{{ route('register') }}">新規登録はこちら</a>
+                            <a href="{{ route('registEmail') }}">新規登録はこちら</a>
                         </div>
                     </div>
                 </div>

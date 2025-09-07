@@ -4,7 +4,7 @@
         <div class="col-md-5 mx-auto">
             <div class="card">
                 <div class="card-header">
-                    <h4 class='text-center'>パスワード再設定</h1>
+                    <h4 class='text-center'>{{$headtxt}}</h1>
                 </div>
                 <div class="card-body">
                     <div class="card-body">
@@ -17,10 +17,10 @@
                             </div>
                             @endif
                         </div>
-                        <form action="{{ route('reset_conf') }}" method="post">
+                        <form action="{{ route($mode) }}" method="post">
                             @csrf
                             <input type="email" class='form-control' name='email'
-                                value="{{old('email'?? '')}}" placeholder="*メールアドレス"><br>
+                                value="{{old('email'?? '')}}" placeholder="メールアドレス"><br>
                             <div class='row justify-content-center'>
                                 <button type='submit' class='btn btn-primary w-25 mt-3'>送信</button>
                             </div>
