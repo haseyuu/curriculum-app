@@ -12,6 +12,7 @@ use App\Favorite;
 use App\Mail\AuthMail;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -43,10 +44,6 @@ class RegistrationController extends Controller
     public function create_user(Request $request)
     {
         $data = $request->session()->get('registration');
-
-        if (!$data) {
-            return redirect()->route('register')->withErrors('セッションの有効期限が切れました。再度入力してください。');
-        }
         
         // user_id が空ならランダムな25文字を生成
         $userId = !empty($data['user_id']) ? $data['user_id'] : Str::random(25);
@@ -131,6 +128,19 @@ class RegistrationController extends Controller
         ));
 
         return redirect()->route('email_conf')->with('email', $email);
+    }
+
+    public function pass_reset(Request $request)
+    {
+        // 入力バリデーション
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return view('password.reset_complete');
     }
 
 }

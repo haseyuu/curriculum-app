@@ -19,9 +19,10 @@
                         </div>
                         <form action="{{ route('reset_comp') }}" method="post">
                             @csrf
+                            <input type="hidden" name="email" value="{{ $email }}">
                             <input type="password" class='form-control' name='password'
                                 placeholder="*パスワード"><br>
-                            <input type="password" class='form-control' name='password_confirm'
+                            <input type="password" class='form-control' name='password_confirmation'
                                 placeholder="*パスワード再入力"><br>
                             <div class='row justify-content-center'>
                                 <button type='submit' class='btn btn-primary w-25 mt-3'>送信</button>

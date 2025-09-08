@@ -2,12 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Post;
+use App\PostTag;
+use App\Tag;
+use App\Image;
+use App\Follow;
+use App\Favorite;
+use App\Mail\AuthMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DisplayController extends Controller
 {
-    // フォーム表示
     public function regist_form(Request $request)
     {
         $token = $request->query('token'); 
@@ -15,9 +26,29 @@ class DisplayController extends Controller
         // トークンからDBでメールアドレスを取得
         $email = DB::table('email_verifications')->where('token', $token)->value('email');
 
+        if (!$email) {
+            return redirect()->route('invalid')->withErrors('このリンクは無効または期限切れです。再度登録してください。');
+        }
+
         $request->session()->put('verified_email', $email);
         
         return view('registration.regist_form', compact('email', 'token'));
+    }
+
+    public function reset_form(Request $request)
+    {
+        $token = $request->query('token'); 
+
+        // トークンからDBでメールアドレスを取得
+        $email = DB::table('email_verifications')->where('token', $token)->value('email');
+
+        if (!$email) {
+            return redirect()->route('invalid')->withErrors('このリンクは無効または期限切れです。再度登録してください。');
+        }
+
+        $request->session()->put('verified_email', $email);
+        
+        return view('password.reset_form', compact('email', 'token'));
     }
 
     public function regist_email_form()
@@ -34,5 +65,30 @@ class DisplayController extends Controller
         $headtxt = 'パスワード再設定用認証';
 
         return view('email.email_form', compact('mode', 'headtxt'));
+    }
+
+    public function login(Request $request){
+        $request->validate([
+            'user_info' => 'required|string',
+            'password'  => 'required|string',
+        ]);
+
+        // ユーザーをメールアドレスかuser_idで検索
+        $user = User::where('email', $request->user_info)
+                    ->orWhere('user_id', $request->user_info)
+                    ->first();
+
+        if (!$user && Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'user_info' => 'メールアドレス/ユーザーID またはパスワードが正しくありません。',
+            ]);
+        }
+        if($user->state<2){
+            Auth::login($user);
+            return redirect()->intended('/');
+        }else if($user->state==2){
+            Auth::login($user);
+            return redirect()->intended('admin');
+        }
     }
 }
