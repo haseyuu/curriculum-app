@@ -91,4 +91,17 @@ class DisplayController extends Controller
             return redirect()->intended('admin');
         }
     }
+
+    public function index(){
+        $user = auth()->user();
+        if(!$user){
+            return redirect()->intended('login');
+        }
+        $posts = Post::with('user', 'images')
+                ->visibleTo($user)
+                ->latest()
+                ->paginate(1);
+                // ->get();
+        return view('main', compact('posts'));
+    }
 }

@@ -26,6 +26,16 @@
         width: 100%;
         z-index: 1000;
     }
+    .sidebar {
+        width: 15vw;
+        height: 100vh;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        padding: 20px 10px;
+    }
     .content {
         margin-top: 56px;
         padding: 20px;
@@ -33,20 +43,12 @@
 </style>
     @yield('stylesheet')
 </head>
-<body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand mx-auto" href="{{ url('/') }}">
-                    test
-                </a>
-            </div>
-        </nav>
-        <div class="content">
-            @yield('content')
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand mx-auto" href="{{ url('/') }}">test</a>
+    </div>
+</nav>
+<div class='content'>
+    @yield('content')
+</div>

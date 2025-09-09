@@ -22,7 +22,7 @@ class CreateAllTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id');
-            $table->string('comment');
+            $table->string('comment')->nullable();
             $table->datetime('reserve')->nullable();
             $table->integer('visibility');
             $table->bigInteger('reply_id')->nullable();

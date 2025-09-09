@@ -36,4 +36,22 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // 相互フォローしているユーザーの ID 配列を返す
+    public function mutualFollowUserIds()
+    {
+        // 自分がフォローしているユーザー
+        $following = \DB::table('follows')
+                    ->where('user_id', $this->id)
+                    ->pluck('follow_id');
+
+        // 自分をフォローしているユーザー
+        $followers = \DB::table('follows')
+                    ->where('follow_id', $this->id)
+                    ->pluck('user_id');
+
+        // 相互フォローしているユーザーIDだけ返す
+        return $following->intersect($followers)->toArray();
+    }
+
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,10 +51,18 @@ Route::get('/profile_edit', function () {
     return view('profile_edit');
 })->name('profile_edit');
 
+
+
+Route::middleware('auth')->group(function () {
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+});
+
 Route::get('/login', function () {
     return view('user.login');
 })->name('login');
 Route::post('/login',[DisplayController::class, 'login'])->name('login');
+
+Route::get('/',[DisplayController::class, 'index'])->name('/');
 
 //認証用メールアドレス入力画面
 Route::get('/passreset/email', [DisplayController::class, 'reset_email_form'])->name('resetEmail');

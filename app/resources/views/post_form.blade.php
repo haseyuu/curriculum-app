@@ -19,7 +19,8 @@
     @yield('stylesheet')
 </head>
 <main class="py-4">
-    <form action="/" method='post'>
+    <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
         <div class="container border p-3" style="max-width: 600px;">
             <div class="d-flex justify-content-between mb-3">
                 <a href="#" class="btn btn-link">戻る</a>
@@ -27,23 +28,23 @@
             </div>
 
             <div class="form-group mb-3">
-                <textarea id="content" class="form-control" maxlength="200" rows="4" placeholder="投稿内容を入力してください"></textarea>
+                <textarea id="content" name="comment" class="form-control" maxlength="200" rows="4" placeholder="投稿内容を入力してください"></textarea>
                 <small id="charCount" class="form-text text-muted">残り200文字</small>
             </div>
 
             <div class="form-group mb-3">
                 <label for="images">画像（最大4枚）</label>
-                <input type="file" id="images" class="form-control-file" accept="image/*" multiple onchange="previewImages(event)">
+                <input type="file" id="images"  name="images[]" class="form-control-file" accept="image/*" multiple onchange="previewImages(event)">
         
                 <div id="previewArea" class="mt-2 d-flex flex-wrap"></div>
             </div>
 
             <div class="form-group mb-3">
                 <label for="scope">投稿範囲</label>
-                <select id="scope" class="form-control">
-                    <option value="public">全体</option>
-                    <option value="mutual">相互フォローのみ</option>
-                    <option value="private">非公開(自分のみ閲覧可)</option>
+                <select id="scope" name="visibility" class="form-control">
+                    <option value=0>全体</option>
+                    <option value=1>相互フォローのみ</option>
+                    <option value=2>非公開(自分のみ閲覧可)</option>
                 </select>
             </div>
         </div>

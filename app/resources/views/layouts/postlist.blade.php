@@ -60,24 +60,78 @@
                 <li class="nav-item"><a href="{{ url('/mypage') }}" class="nav-link">ホーム</a></li>
                 <li class="nav-item"><a href="{{ url('/posting') }}" class="nav-link">投稿</a></li>
                 <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>
-                <li class="nav-item"><a href="{{ url('/logout') }}" class="nav-link">ログアウト</a></li>
+                <li class="nav-item"><a href="{{ url('/login') }}" class="nav-link">ログアウト</a></li>
             </ul>
         </div>
 
         <div class="content">
-            <div class="card-body">
-                @yield('content')
-            </div>
-            @for($i=0;$i<5;$i++)
-            <div class="card-body">
-                <div class="card p-4">
-                    test
-                </div>
-            </div>
-            @endfor
-        </div>
-    </div>
+            <div id="posts-container">
+                @foreach($posts as $post)
+                <div class="card mb-3 p-3">
+                    <!-- 投稿ヘッダー -->
+                    <div class="d-flex align-items-start mb-2">
+                        <img src="{{ $post->user->icon ?? asset('default_icon.png') }}" class="rounded-circle me-3" style="width:50px; height:50px; object-fit:cover; margin-right:1vw;">
+                        <div class="flex-grow-1">
+                            <div><strong>{{ $post->user->name }}</strong></div>
+                            <div class="text-muted">{{ $post->user->user_id }}</div>
+                        </div>
+                        @if(auth()->id() === $post->user_id)
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-outline-primary me-1">編集</button>
+                            <button class="btn btn-sm btn-outline-danger">削除</button>
+                        </div>
+                        @endif
+                    </div>
 
+                    <!-- 投稿本文 -->
+                    <p>{{ $post->comment }}</p>
+
+                    <!-- 画像 -->
+                    @if($post->images->count() > 0)
+                    <div class="d-flex flex-wrap mb-2">
+                        @foreach($post->images as $image)
+                        <img src="{{ asset('storage/' . $image->image) }}" class="img-thumbnail me-2 mb-2" style="max-width:150px;">
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+
+            @if($posts->hasMorePages())
+            <button id="load-more" data-next-page="{{ $posts->nextPageUrl() }}" class="btn btn-primary mt-3">もっと見る</button>
+            @endif
+        </div>
+
+    
+
+<script>
+document.getElementById('load-more')?.addEventListener('click', function(){
+    let button = this;
+    let url = button.dataset.nextPage;
+
+    fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.text())
+    .then(html => {
+        // 取得したHTMLから投稿部分だけを抽出して追加
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        let newPosts = tempDiv.querySelectorAll('#posts-container > div.card');
+        newPosts.forEach(post => document.getElementById('posts-container').appendChild(post));
+
+        // 次ページ URL 更新 or ボタン非表示
+        let nextPageUrl = tempDiv.querySelector('#load-more')?.dataset.nextPage;
+        if(nextPageUrl){
+            button.dataset.nextPage = nextPageUrl;
+        } else {
+            button.style.display = 'none';
+        }
+    });
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>
