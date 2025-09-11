@@ -52,9 +52,12 @@ Route::get('/profile_edit', function () {
 })->name('profile_edit');
 
 
-
+//投稿/編集画面
 Route::middleware('auth')->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
 });
 
 Route::get('/login', function () {
@@ -92,3 +95,13 @@ Route::get('/email/complete', function () {
 Route::get('/email/invalid', function () {
     return view('email.invalid');
 })->name('invalid');
+
+//ユーザーページ
+Route::get('/users/{user_id}', [DisplayController::class, 'page'])
+    ->name('users.page');
+
+//Ajax 用
+Route::get('/users/{user_id}/posts', [DisplayController::class, 'getPosts'])
+    ->name('users.posts');
+Route::get('/users/{user_id}/likes', [DisplayController::class, 'getLikes'])
+    ->name('users.likes');

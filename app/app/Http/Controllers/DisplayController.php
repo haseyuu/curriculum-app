@@ -19,8 +19,7 @@ use Illuminate\Support\Str;
 
 class DisplayController extends Controller
 {
-    public function regist_form(Request $request)
-    {
+    public function regist_form(Request $request){
         $token = $request->query('token'); 
 
         // トークンからDBでメールアドレスを取得
@@ -35,8 +34,7 @@ class DisplayController extends Controller
         return view('registration.regist_form', compact('email', 'token'));
     }
 
-    public function reset_form(Request $request)
-    {
+    public function reset_form(Request $request){
         $token = $request->query('token'); 
 
         // トークンからDBでメールアドレスを取得
@@ -51,16 +49,14 @@ class DisplayController extends Controller
         return view('password.reset_form', compact('email', 'token'));
     }
 
-    public function regist_email_form()
-    {
+    public function regist_email_form(){
         $mode = 'regist_conf';
         $headtxt = '新規登録用メールアドレス認証';
 
         return view('email.email_form', compact('mode', 'headtxt'));
     }
 
-    public function reset_email_form()
-    {
+    public function reset_email_form(){
         $mode = 'reset_conf';
         $headtxt = 'パスワード再設定用認証';
 
@@ -100,8 +96,24 @@ class DisplayController extends Controller
         $posts = Post::with('user', 'images')
                 ->visibleTo($user)
                 ->latest()
-                ->paginate(1);
+                ->paginate(2);
                 // ->get();
         return view('main', compact('posts'));
     }
+
+    public function page($user_id){
+        $user = User::where('user_id', $user_id)->firstOrFail();
+
+        // 投稿一覧
+        $posts = $user->posts()->with('images', 'user')->latest()->paginate(2);
+
+        // いいね一覧
+        $likes = Post::whereIn('id', $user->likes()->pluck('post_id'))
+                    ->with('images', 'user')
+                    ->latest()
+                    ->paginate(10);
+
+        return view('user.user_page', compact('user', 'posts', 'likes'));
+    }
+
 }

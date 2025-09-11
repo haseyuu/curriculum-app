@@ -38,7 +38,8 @@ class Post extends Model
     public function scopeVisibleTo($query, $user)
     {
         return $query->where(function($q) use ($user) {
-            $q->where('visibility', 0) // 全体公開
+            $q->where('visibility', 0)
+              ->whereIn('user_id', $user->follows()->pluck('follow_id'))
               ->orWhere(function($q2) use ($user) {
                   // 相互フォローのみ
                   $q2->where('visibility', 1)
@@ -46,8 +47,7 @@ class Post extends Model
               })
               ->orWhere(function($q3) use ($user) {
                   // 自分の投稿
-                  $q3->where('visibility', 2)
-                     ->where('user_id', $user->id);
+                  $q3->where('user_id', $user->id);
               });
         });
     }

@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Follow;
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -37,21 +39,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // 相互フォローしているユーザーの ID 配列を返す
-    public function mutualFollowUserIds()
-    {
-        // 自分がフォローしているユーザー
-        $following = \DB::table('follows')
-                    ->where('user_id', $this->id)
-                    ->pluck('follow_id');
+    public function follows(){
+        return $this->hasMany(Follow::class, 'user_id');
+    }
 
-        // 自分をフォローしているユーザー
-        $followers = \DB::table('follows')
-                    ->where('follow_id', $this->id)
-                    ->pluck('user_id');
+    public function followers(){
+        return $this->hasMany(Follow::class, 'follow_id');
+    }
 
-        // 相互フォローしているユーザーIDだけ返す
-        return $following->intersect($followers)->toArray();
+    public function posts(){
+        return $this->hasMany(Post::class, 'user_id', 'id');
+    }
+
+    public function likes(){
+        return $this->hasMany(Favorite::class, 'user_id', 'id');
+    }
+
+    public function mutualFollowUserIds(){
+        $followingIds = $this->follows()->pluck('follow_id')->toArray();
+        $followerIds  = $this->followers()->pluck('user_id')->toArray();
+
+        return array_intersect($followingIds, $followerIds);
     }
 
 }

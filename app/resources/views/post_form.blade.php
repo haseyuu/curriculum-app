@@ -19,8 +19,11 @@
     @yield('stylesheet')
 </head>
 <main class="py-4">
-    <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    <form action="{{ isset($post) ? route('posts.update', $post->id) : route('posts.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+        @if(isset($post))
+            @method('PUT')
+        @endif
         <div class="container border p-3" style="max-width: 600px;">
             <div class="d-flex justify-content-between mb-3">
                 <a href="#" class="btn btn-link">戻る</a>
@@ -28,23 +31,36 @@
             </div>
 
             <div class="form-group mb-3">
-                <textarea id="content" name="comment" class="form-control" maxlength="200" rows="4" placeholder="投稿内容を入力してください"></textarea>
+                <textarea id="content" name="comment" class="form-control" maxlength="200" rows="4" placeholder="投稿内容を入力してください">{{ old('comment', $post->comment ?? '') }}</textarea>
                 <small id="charCount" class="form-text text-muted">残り200文字</small>
             </div>
 
             <div class="form-group mb-3">
                 <label for="images">画像（最大4枚）</label>
-                <input type="file" id="images"  name="images[]" class="form-control-file" accept="image/*" multiple onchange="previewImages(event)">
-        
-                <div id="previewArea" class="mt-2 d-flex flex-wrap"></div>
+                <input type="file" id="images" name="images[]" class="form-control-file" accept="image/*" multiple onchange="previewImages(event)">
+
+                <div id="previewArea" class="mt-2 d-flex flex-wrap">
+                    {{-- 既存画像の表示 --}}
+                    @if(isset($post) && $post->images)
+                        @foreach($post->images as $image)
+                        <div class="position-relative m-2">
+                            <img src="{{ asset('storage/' . $image->image) }}" class="img-thumbnail" style="max-width:150px;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                    style="top:0; right:0; transform: translate(50%,-50%); border-radius:50%;"
+                                    onclick="removeExistingImage(this, {{ $image->id }})">×</button>
+                            <input type="hidden" name="existing_images[]" value="{{ $image->id }}">
+                        </div>
+                        @endforeach
+                    @endif
+                </div>
             </div>
 
             <div class="form-group mb-3">
                 <label for="scope">投稿範囲</label>
                 <select id="scope" name="visibility" class="form-control">
-                    <option value=0>全体</option>
-                    <option value=1>相互フォローのみ</option>
-                    <option value=2>非公開(自分のみ閲覧可)</option>
+                    <option value=0 {{ (old('visibility', $post->visibility ?? 0) == 0) ? 'selected' : '' }}>全体</option>
+                    <option value=1 {{ (old('visibility', $post->visibility ?? 0) == 1) ? 'selected' : '' }}>相互フォローのみ</option>
+                    <option value=2 {{ (old('visibility', $post->visibility ?? 0) == 2) ? 'selected' : '' }}>非公開(自分のみ閲覧可)</option>
                 </select>
             </div>
         </div>
@@ -52,61 +68,72 @@
 </main>
 
 <script>
-let selectedFiles = [];
+    let selectedFiles = [];
 
-function previewImages(event) {
-    const files = Array.from(event.target.files);
-
-    if (selectedFiles.length + files.length > 4) {
-        alert("画像は最大4枚までです。");
-        return;
+    // 既存画像を削除する
+    function removeExistingImage(btn, imageId) {
+        // 親要素を削除
+        btn.parentElement.remove();
+        // hidden input も削除されるので、フォーム送信時に除外される
     }
 
-    files.forEach(file => {
-        if (selectedFiles.length < 4) {
-            selectedFiles.push(file);
+    function previewImages(event) {
+        const files = Array.from(event.target.files);
+
+        if (selectedFiles.length + files.length > 4) {
+            alert("画像は最大4枚までです。");
+            return;
         }
-    });
 
-    renderPreviews();
-}
+        files.forEach(file => {
+            if (selectedFiles.length < 4) {
+                selectedFiles.push(file);
+            }
+        });
 
-function renderPreviews() {
-    const previewArea = document.getElementById('previewArea');
-    previewArea.innerHTML = '';
+        renderPreviews();
+    }
 
-    selectedFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const wrapper = document.createElement('div');
-            wrapper.classList.add("position-relative", "m-2");
-            
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.classList.add("img-thumbnail");
-            img.style.maxWidth = "150px";
+    function renderPreviews() {
+        const previewArea = document.getElementById('previewArea');
 
-            const removeBtn = document.createElement('button');
-            removeBtn.textContent = "×";
-            removeBtn.classList.add("btn", "btn-danger", "btn-sm", "position-absolute");
-            removeBtn.style.top = "0";
-            removeBtn.style.right = "0";
-            removeBtn.style.transform = "translate(50%,-50%)";
-            removeBtn.style.borderRadius = "50%";
-            removeBtn.addEventListener('click', () => {
-                removeImage(index);
-            });
+        // 既存画像は残す
+        const existing = Array.from(previewArea.querySelectorAll('input[name="existing_images[]"]')).map(el => el.parentElement);
+        previewArea.innerHTML = '';
+        existing.forEach(el => previewArea.appendChild(el));
 
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            previewArea.appendChild(wrapper);
-        }
-        reader.readAsDataURL(file);
-    });
-}
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.createElement('div');
+                wrapper.classList.add("position-relative", "m-2");
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add("img-thumbnail");
+                img.style.maxWidth = "150px";
 
-function removeImage(index) {
-    selectedFiles.splice(index, 1);
-    renderPreviews();
-}
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = "×";
+                removeBtn.classList.add("btn", "btn-danger", "btn-sm", "position-absolute");
+                removeBtn.style.top = "0";
+                removeBtn.style.right = "0";
+                removeBtn.style.transform = "translate(50%,-50%)";
+                removeBtn.style.borderRadius = "50%";
+                removeBtn.addEventListener('click', () => {
+                    removeImage(index);
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewArea.appendChild(wrapper);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeImage(index) {
+        selectedFiles.splice(index, 1);
+        renderPreviews();
+    }
 </script>
