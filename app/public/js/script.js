@@ -113,13 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    card.remove(); // 投稿カードを削除
-                } else {
-                    alert('削除に失敗しました');
-                }
-            })
             .catch(err => console.error(err));
         }
     });
