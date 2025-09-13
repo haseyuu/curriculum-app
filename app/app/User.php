@@ -40,11 +40,11 @@ class User extends Authenticatable
     ];
 
     public function follows(){
-        return $this->hasMany(Follow::class, 'user_id');
+        return $this->belongsToMany(User::class, 'follows', 'user_id', 'follow_id');
     }
 
     public function followers(){
-        return $this->hasMany(Follow::class, 'follow_id');
+        return $this->belongsToMany(User::class, 'follows', 'follow_id', 'user_id');
     }
 
     public function posts(){
@@ -57,7 +57,7 @@ class User extends Authenticatable
 
     public function mutualFollowUserIds(){
         $followingIds = $this->follows()->pluck('follow_id')->toArray();
-        $followerIds  = $this->followers()->pluck('user_id')->toArray();
+        $followerIds  = $this->followers()->pluck('follows.user_id')->toArray();
 
         return array_intersect($followingIds, $followerIds);
     }

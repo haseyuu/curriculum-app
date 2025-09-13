@@ -113,6 +113,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    card.remove();
+                } else {
+                    alert('削除に失敗しました');
+                }
+            })
             .catch(err => console.error(err));
         }
     });
