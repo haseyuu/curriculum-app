@@ -21,8 +21,7 @@ use Illuminate\Support\Str;
 class RegistrationController extends Controller
 {
     // 確認画面
-    public function confirm(Request $request)
-    {
+    public function confirm(Request $request){
         $request->validate([
             'name'         => 'required|string|max:50',
             'user_id'           => 'nullable|string|max:20|unique:users,user_id',
@@ -41,8 +40,7 @@ class RegistrationController extends Controller
     }
 
     // 保存処理
-    public function create_user(Request $request)
-    {
+    public function create_user(Request $request){
         $data = $request->session()->get('registration');
         
         // user_id が空ならランダムな25文字を生成
@@ -61,8 +59,7 @@ class RegistrationController extends Controller
     }
 
     //新規登録確認メール送信
-    public function send_regist_email(Request $request)
-    {
+    public function send_regist_email(Request $request){
         $request->validate([
             'email' => 'required|email|unique:users,email', // 登録済みメールは不可
         ]);
@@ -96,8 +93,7 @@ class RegistrationController extends Controller
     }
 
     //パスワード再設定メール送信
-    public function send_reset_email(Request $request)
-    {
+    public function send_reset_email(Request $request){
         $request->validate([
             'email' => 'required|email|exists:users,email', // 登録済みメールである必要あり
         ]);
@@ -130,8 +126,7 @@ class RegistrationController extends Controller
         return redirect()->route('email_conf')->with('email', $email);
     }
 
-    public function pass_reset(Request $request)
-    {
+    public function pass_reset(Request $request){
         // 入力バリデーション
         $request->validate([
             'password' => 'required|string|min:8|confirmed',
@@ -141,6 +136,46 @@ class RegistrationController extends Controller
         $user->save();
 
         return view('password.reset_complete');
+    }
+
+    public function follow($id){
+        if(auth()->id() == $id || $id == 1){
+            return response()->json([
+                'success' => false,
+                'message' => 'フォローできないユーザーです'
+            ], 403);
+        }
+        if(auth()->user()->follows()->where('follow_id',$id)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => 'すでにフォローしています'
+            ]);
+        }
+        Follow::create([
+            'user_id'=>auth()->id(),
+            'follow_id'=>$id,
+        ]);
+        return response()->json(['success' => true]);
+    }
+
+    public function unfollow($id){
+        if(auth()->id() == $id || $id == 1){
+            return response()->json([
+                'success' => false,
+                'message' => 'フォローできないユーザーです'
+            ], 403);
+        }
+        if(!auth()->user()->follows()->where('follow_id',$id)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => 'まだフォローしていません'
+            ]);
+        }
+        DB::table('follows')
+        ->where('user_id', auth()->id())
+        ->where('follow_id', $id)
+        ->delete();
+        return response()->json(['success' => true]);
     }
 
 }

@@ -18,9 +18,9 @@
                 @if(auth()->id() === $user->id)
                     <a href="" class="btn btn-outline-secondary">プロフィール編集</a>
                 @elseif($user->follows->contains(auth()->id()))
-                    <button class="btn btn-outline-primary" id="btn-follow">フォロー解除</button>
+                    <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
                 @elseif(!$user->follows->contains(auth()->id()))
-                    <button class="btn btn-outline-primary" id="btn-follow">フォローする</button>
+                    <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
                 @endif
             </div>
         </div>

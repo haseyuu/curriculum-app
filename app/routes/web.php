@@ -52,12 +52,17 @@ Route::get('/profile_edit', function () {
 })->name('profile_edit');
 
 
-//投稿/編集画面
+
 Route::middleware('auth')->group(function () {
+    //投稿/編集画面
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
+    
+    //フォロー/アンフォロー
+    Route::post('/user/{id}', [RegistrationController::class, 'follow'])->name('user.follow');
+    Route::delete('/user/{id}', [RegistrationController::class, 'unfollow'])->name('user.unfollow');
 });
 
 Route::get('/login', function () {

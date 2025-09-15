@@ -1,0 +1,6 @@
+{
+    "editor.scrollbar.horizontalScrollbarSize": 12,
+    "workbench.editor.wrapTabs": true,
+    "workbench.editor.titleScrollbarSizing": "large",
+    "editor.minimap.enabled": false
+}

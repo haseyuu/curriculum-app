@@ -123,4 +123,57 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error(err));
         }
     });
+
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('#btn-follow')) {
+            const btn = e.target;
+            const id = btn.dataset.id;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            if (btn.value=='0') {
+                if (!confirm('本当に解除しますか？')) return;
+
+                fetch(`/user/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.value='1';
+                        btn.textContent='フォローする';
+                    } else {
+                        alert('フォロー解除に失敗しました');
+                    }
+                })
+                .catch(err => console.error(err));
+
+            } else {
+                if (!confirm('本当にフォローしますか？')) return;
+                
+                fetch(`/user/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.value='0';
+                        btn.textContent='フォロー解除';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        }
+    });
+
 });
