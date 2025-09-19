@@ -77,6 +77,12 @@
                         @endforeach
                     </div>
                     @endif
+                    @if($post->likedByUsers->contains(auth()->id()))
+                        <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                    @else
+                        <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="0" style="cursor:pointer;"><b>☆</b></span>
+                    @endif
+                    <span class="like-count">{{ $post->likedByUsers()->count() }}</span>
                 </div>
                 @endforeach
                 @if($posts->hasMorePages())
@@ -108,6 +114,12 @@
                         @endforeach
                     </div>
                     @endif
+                    @if($like->likedByUsers->contains(auth()->id()))
+                        <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                    @else
+                        <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="0" style="cursor:pointer;"><b>☆</b></span>
+                    @endif
+                    <span class="like-count">{{ $like->likedByUsers()->count() }}</span>
                 </div>
                 @endforeach
                 @if($likes->hasMorePages())

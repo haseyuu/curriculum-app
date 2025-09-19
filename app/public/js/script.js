@@ -10,11 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- 投稿 / いいね切り替え (user_page 用) ---
     if (btnPosts && btnLikes && postsList && likesList) {
         btnPosts.addEventListener('click', () => {
+            alert('post');
             postsList.style.display = 'block';
             likesList.style.display = 'none';
         });
 
         btnLikes.addEventListener('click', () => {
+            alert('favo');
             postsList.style.display = 'none';
             likesList.style.display = 'block';
         });
@@ -167,6 +169,55 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         btn.value='0';
                         btn.textContent='フォロー解除';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.btn-favo')) {
+            const btn = e.target;
+            const id = btn.dataset.id;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            // alert('test');
+            if (btn.dataset.liked=='0') {
+
+                fetch(`/favo/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.dataset.liked='1';
+                        btn.textContent='★';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => console.error(err));
+
+            } else {
+
+                fetch(`/favo/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.dataset.liked='0';
+                        btn.textContent='☆';
                     } else {
                         alert(data.message);
                     }

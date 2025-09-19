@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use App\Follow;
+use App\Favorites;
+use App\Posts;
 
 class User extends Authenticatable
 {
@@ -51,8 +53,8 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'user_id', 'id');
     }
 
-    public function likes(){
-        return $this->hasMany(Favorite::class, 'user_id', 'id');
+    public function favorites(){
+        return $this->belongsToMany(Post::class, 'favorites', 'user_id', 'post_id');
     }
 
     public function mutualFollowUserIds(){

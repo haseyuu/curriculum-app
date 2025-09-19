@@ -178,4 +178,44 @@ class RegistrationController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function favo($id){
+        if(Post::where('id',$id)->value('visibility')===2){
+            return response()->json([
+                'success' => false,
+                'message' => 'いいねできない投稿です'
+            ], 403);
+        }
+        if(auth()->user()->favorites()->where('post_id',$id)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => 'すでにいいねしています'
+            ]);
+        }
+        Favorite::create([
+            'user_id'=>auth()->id(),
+            'post_id'=>$id,
+        ]);
+        return response()->json(['success' => true]);
+    }
+    
+    public function unfavo($id){
+        if(Post::where('id',$id)->value('visibility')===2){
+            return response()->json([
+                'success' => false,
+                'message' => 'いいねできない投稿です'
+            ], 403);
+        }
+        if(!auth()->user()->favorites()->where('post_id',$id)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => 'いいねしていません'
+            ]);
+        }
+        DB::table('favorites')
+        ->where('user_id', auth()->id())
+        ->where('post_id', $id)
+        ->delete();
+        return response()->json(['success' => true]);
+    }
+
 }

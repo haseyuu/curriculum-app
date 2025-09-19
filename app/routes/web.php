@@ -63,6 +63,10 @@ Route::middleware('auth')->group(function () {
     //フォロー/アンフォロー
     Route::post('/user/{id}', [RegistrationController::class, 'follow'])->name('user.follow');
     Route::delete('/user/{id}', [RegistrationController::class, 'unfollow'])->name('user.unfollow');
+
+    //いいね/いいね解除
+    Route::post('/favo/{id}', [RegistrationController::class, 'favo'])->name('post.favo');
+    Route::delete('/favo/{id}', [RegistrationController::class, 'unfavo'])->name('post.unfavo');
 });
 
 Route::get('/login', function () {

@@ -108,7 +108,7 @@ class DisplayController extends Controller
         $posts = $user->posts()->with('images', 'user')->latest()->paginate(2);
 
         // いいね一覧
-        $likes = Post::whereIn('id', $user->likes()->pluck('post_id'))
+        $likes = Post::whereIn('id', $user->favorites()->pluck('post_id'))
                     ->with('images', 'user')
                     ->latest()
                     ->paginate(10);

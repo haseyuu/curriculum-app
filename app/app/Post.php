@@ -33,6 +33,11 @@ class Post extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'post_id', 'user_id');
+    }
     
     // 自分が見れる投稿を取得するスコープ
     public function scopeVisibleTo($query, $user)
