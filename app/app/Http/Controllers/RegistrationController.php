@@ -139,6 +139,7 @@ class RegistrationController extends Controller
     }
 
     public function follow($id){
+        if(!auth()->user())return response()->json(['success' => false,'message'=>'ログインをしてください']);
         if(auth()->id() == $id || $id == 1){
             return response()->json([
                 'success' => false,
@@ -159,6 +160,7 @@ class RegistrationController extends Controller
     }
 
     public function unfollow($id){
+        if(!auth()->user())return response()->json(['success' => false,'message'=>'ログインをしてください']);
         if(auth()->id() == $id || $id == 1){
             return response()->json([
                 'success' => false,
@@ -179,6 +181,7 @@ class RegistrationController extends Controller
     }
 
     public function favo($id){
+        if(!auth()->user())return response()->json(['success' => false,'message'=>'ログインをしてください']);
         if(Post::where('id',$id)->value('visibility')===2){
             return response()->json([
                 'success' => false,
@@ -195,10 +198,12 @@ class RegistrationController extends Controller
             'user_id'=>auth()->id(),
             'post_id'=>$id,
         ]);
-        return response()->json(['success' => true]);
+        $cnt = Favorite::where('post_id',$id)->count();
+        return response()->json(['success' => true,'count'=>$cnt]);
     }
     
     public function unfavo($id){
+        if(!auth()->user())return response()->json(['success' => false,'message'=>'ログインをしてください']);
         if(Post::where('id',$id)->value('visibility')===2){
             return response()->json([
                 'success' => false,
@@ -215,7 +220,8 @@ class RegistrationController extends Controller
         ->where('user_id', auth()->id())
         ->where('post_id', $id)
         ->delete();
-        return response()->json(['success' => true]);
+        $cnt = Favorite::where('post_id',$id)->count();
+        return response()->json(['success' => true,'count'=>$cnt]);
     }
 
 }

@@ -57,4 +57,20 @@ class Post extends Model
         });
     }
 
+    //検索時の取得範囲
+    public function scopeVisibleAll($query, $user)
+    {
+        return $query->where(function($q) use ($user) {
+            $q->where('visibility', 0)
+              ->orWhere(function($q2) use ($user) {
+                  // 相互フォローのみ
+                  $q2->where('visibility', 1)
+                     ->whereIn('user_id', $user->mutualFollowUserIds());
+              })
+              ->orWhere(function($q3) use ($user) {
+                  // 自分の投稿
+                  $q3->where('user_id', $user->id);
+              });
+        });
+    }
 }

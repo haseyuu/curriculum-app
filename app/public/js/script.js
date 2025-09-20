@@ -183,9 +183,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const btn = e.target;
             const id = btn.dataset.id;
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            // alert('test');
+            alert('test');
             if (btn.dataset.liked=='0') {
-
                 fetch(`/favo/${id}`, {
                     method: 'POST',
                     headers: {
@@ -196,8 +195,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        alert(data.count);
                         btn.dataset.liked='1';
                         btn.textContent='★';
+                        btn.nextElementSibling.textContent = data.count;
                     } else {
                         alert(data.message);
                     }
@@ -216,8 +217,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        alert(data.count);
                         btn.dataset.liked='0';
                         btn.textContent='☆';
+                        btn.nextElementSibling.textContent = data.count;
                     } else {
                         alert(data.message);
                     }

@@ -116,4 +116,25 @@ class DisplayController extends Controller
         return view('user.user_page', compact('user', 'posts', 'likes'));
     }
 
+    public function search_page(){
+        $posts = null;
+        return view('search', compact('posts'));
+    }
+
+    public function search(Request $request){
+        $word = $request->input('search_word','');
+
+        $user = auth()->user();
+
+        if (!$word) {
+            $posts = null;
+            return view('search', compact('posts'));
+        }
+
+        $posts = Post::where('comment', 'like', "%{$word}%")
+            ->paginate(2)
+            ->appends(['search_word'=>$word]);
+
+        return view('search', compact('posts'));
+    }
 }

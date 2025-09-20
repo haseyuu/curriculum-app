@@ -15,41 +15,11 @@ use App\Http\Controllers\PostController;
 |
 */
 
-Route::get('/', function () {
-    return view('main');
-    //return view('welcome');
-})->name('/');
 Route::get('admin', function () {
     return view('admin');
     //return view('welcome');
 })->name('admin');
-Route::get('/pass_reset', function () {
-    return view('email_form');
-})->name('pass_reset');
-Route::get('/email_change', function () {
-    return view('email_form');
-})->name('email_change');
-Route::get('/follow', function () {
-    return view('user.follows');
-})->name('follow');
-Route::get('/user_page', function () {
-    return view('user.user_page');
-})->name('user_page');
-Route::get('/reset_form', function () {
-    return view('reset_form');
-})->name('reset_form');
-Route::post('/reset_comp', function () {
-    return view('reset_complete');
-})->name('reset_comp');
-Route::get('/posting', function () {
-    return view('post_form');
-})->name('posting');
-Route::get('/search', function () {
-    return view('search');
-})->name('search');
-Route::get('/profile_edit', function () {
-    return view('profile_edit');
-})->name('profile_edit');
+
 
 
 
@@ -105,9 +75,12 @@ Route::get('/email/invalid', function () {
     return view('email.invalid');
 })->name('invalid');
 
+//検索
+// Route::get('/search',[DisplayController::class, 'search_page'])->name('view_search');
+Route::get('/search',[DisplayController::class, 'search'])->name('search');
+
 //ユーザーページ
-Route::get('/users/{user_id}', [DisplayController::class, 'page'])
-    ->name('users.page');
+Route::get('/users/{user_id}', [DisplayController::class, 'page'])->name('users.page');
 
 //Ajax 用
 Route::get('/users/{user_id}/posts', [DisplayController::class, 'getPosts'])

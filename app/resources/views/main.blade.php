@@ -31,6 +31,12 @@ aaaa
                 @endforeach
             </div>
             @endif
+            @if($post->likedByUsers->contains(auth()->id()))
+                <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="1" style="cursor:pointer;">★</span>
+            @else
+                <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="0" style="cursor:pointer;">☆</span>
+            @endif
+            <span class="favo-count">{{ $post->likedByUsers()->count() }}</span>
         </div>
         @endforeach
     </div>
