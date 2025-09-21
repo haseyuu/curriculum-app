@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const postMoreBtn = document.getElementById('post-more');
     const likeMoreBtn = document.getElementById('like-more');
     const loadMoreBtn = document.getElementById('load-more');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarInput = document.getElementById('avatarInput');
+    const cropDoneBtn = document.getElementById('cropDoneBtn');
+    const form = document.getElementById('profileForm');
+
+    let cropper;
+
 
     // --- 投稿 / いいね切り替え (user_page 用) ---
     if (btnPosts && btnLikes && postsList && likesList) {
@@ -227,6 +234,66 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(err => console.error(err));
             }
+        }
+    });
+    avatarPreview.addEventListener('click', function() {
+        if (!cropper) {
+            avatarInput.click();
+        }
+    });
+
+    avatarInput.addEventListener('change', function(e){
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event){
+            avatarPreview.src = event.target.result;
+
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(avatarPreview, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+            });
+
+            cropDoneBtn.style.display = 'inline-block'; // 完了ボタン表示
+        };
+        reader.readAsDataURL(file);
+    });
+
+    cropDoneBtn.addEventListener('click', function(){
+        if (!cropper) return;
+
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            const file = new File([blob], 'avatar.png', { type: 'image/png' });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            avatarInput.files = dataTransfer.files;
+
+            const url = URL.createObjectURL(blob);
+            avatarPreview.src = url;
+
+            cropper.destroy();
+            cropper = null;
+            cropDoneBtn.style.display = 'none';
+        });
+    });
+
+    form.addEventListener('submit', function(e){
+        if (cropper) {
+            e.preventDefault();
+            cropper.getCroppedCanvas().toBlob((blob) => {
+                const file = new File([blob], 'avatar.png', { type: 'image/png' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                avatarInput.files = dataTransfer.files;
+
+                cropper.destroy();
+                cropper = null;
+                cropDoneBtn.style.display = 'none';
+                form.submit();
+            });
         }
     });
 

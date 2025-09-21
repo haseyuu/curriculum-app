@@ -29,7 +29,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
-    
+    Route::get('posting', function () {
+        return view('post_form');
+    })->name('posting');
+
     //フォロー/アンフォロー
     Route::post('/user/{id}', [RegistrationController::class, 'follow'])->name('user.follow');
     Route::delete('/user/{id}', [RegistrationController::class, 'unfollow'])->name('user.unfollow');
@@ -37,6 +40,11 @@ Route::middleware('auth')->group(function () {
     //いいね/いいね解除
     Route::post('/favo/{id}', [RegistrationController::class, 'favo'])->name('post.favo');
     Route::delete('/favo/{id}', [RegistrationController::class, 'unfavo'])->name('post.unfavo');
+
+    //プロフィール編集
+    Route::get('/profile/{user_id}', [DisplayController::class, 'profile_edit_view'])->name('profile_edit');
+    Route::put('/profile/{user_id}', [RegistrationController::class, 'profile_update'])->name('profile_edit');
+
 });
 
 Route::get('/login', function () {
@@ -74,6 +82,10 @@ Route::get('/email/complete', function () {
 Route::get('/email/invalid', function () {
     return view('email.invalid');
 })->name('invalid');
+
+//フォロー/フォロワー一覧
+Route::get('/follows/{user_id}',[DisplayController::class, 'follows_view'])->name('follows');
+Route::get('/followers/{user_id}',[DisplayController::class, 'followers_view'])->name('followers');
 
 //検索
 // Route::get('/search',[DisplayController::class, 'search_page'])->name('view_search');

@@ -55,8 +55,8 @@
         </nav>
        <div id="app">
         <div class="sidebar">
-            <h4 class="text-center">メニュー</h4>
             <ul class="nav flex-column">
+                <li class="nav-item"><a href="{{ url('/users/' . auth()->user()->user_id) }}" class="nav-link">マイページ</a></li>
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
                 <li class="nav-item"><a href="{{ url('/posting') }}" class="nav-link">投稿</a></li>
                 <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>

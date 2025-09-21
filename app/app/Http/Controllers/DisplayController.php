@@ -123,7 +123,7 @@ class DisplayController extends Controller
 
     public function search(Request $request){
         $word = $request->input('search_word','');
-
+        
         $user = auth()->user();
 
         if (!$word) {
@@ -131,10 +131,28 @@ class DisplayController extends Controller
             return view('search', compact('posts'));
         }
 
-        $posts = Post::where('comment', 'like', "%{$word}%")
+        $posts = Post::visibleAll($user)
+            ->where('comment', 'like', "%{$word}%")
+            ->latest()
             ->paginate(2)
             ->appends(['search_word'=>$word]);
 
         return view('search', compact('posts'));
+    }
+
+    public function follows_view($user_id){
+        $users = User::where('user_id',$user_id)->first()->follows;
+        return view('user.follows',compact('users'));
+    }
+
+    public function followers_view($user_id){
+        $users = User::where('user_id',$user_id)->first()->followers;
+        return view('user.follows',compact('users'));
+    }
+
+    public function profile_edit_view($user_id){
+        if(auth()->user()->user_id!==$user_id)return view('error');
+        $user = User::where('user_id',$user_id)->first();
+        return view('user.profile_edit',compact('user'));
     }
 }

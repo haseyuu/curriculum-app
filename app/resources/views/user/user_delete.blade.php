@@ -26,15 +26,6 @@
                 </div>
                 <div class="card-body">
                     <div class="card-body">
-                        <div class ='panel-body'>
-                            @if($errors->any())
-                            <div class="alert alert-danger">
-                                @foreach($errors->all() as $message)
-                                <p>{{ $message }}</p>
-                                @endforeach
-                            </div>
-                            @endif
-                        </div>
                         <div class="container">
                             <form id="profileForm" action="#" method="POST" enctype="multipart/form-data">
                                 @csrf
@@ -42,12 +33,6 @@
                                     <img id="avatarPreview" src="" 
                                         class="rounded-circle border" 
                                         style="width:150px; height:150px; object-fit:cover; cursor:pointer;">
-                                    <input type="file" id="avatarInput" name="avatar" accept="image/*" class="d-none">
-
-                                    <button type="button" id="cropDoneBtn" class="btn btn-success btn-sm" 
-                                            style="position:absolute; bottom:-35px; left:50%; transform:translateX(-50%); display:none;">
-                                        完了
-                                    </button>
                                 </div>
 
                                 <div class="mb-3">
@@ -56,7 +41,7 @@
                                     <label for="name" class="form-label">メールアドレス</label>
                                 </div>
                                 <div class="d-flex justify-content-center mb-3">
-                                    <a href="" class="btn btn-secondary">戻る</a>
+                                    <a href="{{ url()->previous() }}" class="btn btn-secondary">戻る</a>
                                 </div><br><br><br>
                                 <div class="d-flex justify-content-center mb-3">
                                 <a href="" class="btn btn-danger">アカウント削除</a>

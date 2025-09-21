@@ -16,7 +16,7 @@
             <div class="card mb-3 p-3">
                 <div class="d-flex align-items-start mb-2">
                     <a href="{{ url('/users/' . $post->user->user_id) }}">
-                        <img src="{{ $post->user->icon ?? asset('default_icon.png') }}" 
+                        <img src="{{ $post->user->icon ? asset('storage/' . $post->user->icon) : asset('default\_icon.png') }}" 
                             class="rounded-circle me-3" 
                             style="width:50px; height:50px; object-fit:cover; margin-right:1vw;">
                     </a>

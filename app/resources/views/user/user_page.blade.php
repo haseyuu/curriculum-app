@@ -6,7 +6,7 @@
         <!-- ユーザー情報 -->
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div class="d-flex align-items-center">
-                <img src="{{ $user->icon ?? asset('default_icon.png') }}" 
+                <img src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
                      class="rounded-circle border me-3" 
                      style="width:100px; height:100px; object-fit:cover;margin-right:1vw;">
                 <div>
@@ -16,7 +16,7 @@
             </div>
             <div>
                 @if(auth()->id() === $user->id)
-                    <a href="" class="btn btn-outline-secondary">プロフィール編集</a>
+                    <a href="{{ url('/profile/' . $user->user_id) }}" class="btn btn-outline-secondary">プロフィール編集</a>
                 @elseif($user->follows->contains(auth()->id()))
                     <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
                 @elseif(!$user->follows->contains(auth()->id()))
@@ -27,14 +27,18 @@
 
         <hr>
 
+        <p class="profile-text mb-0">
+            {{$user->profile}}
+        </p><br>
+
         <!-- フォロー／フォロワー／投稿／いいね -->
         <div class="d-flex justify-content-around border-top pt-3 mb-3">
             <div class="text-center">
-                <strong>フォロー</strong><br>
+                <a href="{{ url('/follows/' . $user->user_id) }}"><strong>フォロー</strong></a><br>
                 <span>{{ $user->follows()->count() }}</span>
             </div>
             <div class="text-center">
-                <strong>フォロワー</strong><br>
+                <a href="{{ url('/followers/' . $user->user_id) }}"><strong>フォロワー</strong></a><br>
                 <span>{{ $user->followers()->count() }}</span>
             </div>
             <div class="text-center">
@@ -52,7 +56,7 @@
                 <div class="card mb-3 p-3">
                     <div class="d-flex align-items-start mb-2">
                         <a href="{{ url('/users/' . $post->user->user_id) }}">
-                            <img src="{{ $post->user->icon ?? asset('default_icon.png') }}" 
+                            <img src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
                                 class="rounded-circle me-3" 
                                 style="width:50px; height:50px; object-fit:cover; margin-right:1vw;">
                         </a>
@@ -95,7 +99,7 @@
                 <div class="card mb-3 p-3">
                     <div class="d-flex align-items-start mb-2">
                         <a href="{{ url('/users/' . $like->user->user_id) }}">
-                            <img src="{{ $like->user->icon ?? asset('default_icon.png') }}" 
+                            <img src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
                                 class="rounded-circle me-3" 
                                 style="width:50px; height:50px; object-fit:cover; margin-right:1vw;">
                         </a>

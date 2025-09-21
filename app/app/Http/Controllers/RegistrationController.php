@@ -23,7 +23,7 @@ class RegistrationController extends Controller
     // 確認画面
     public function confirm(Request $request){
         $request->validate([
-            'name'         => 'required|string|max:50',
+            'name'         => 'required|string|max:20',
             'user_id'           => 'nullable|string|max:20|unique:users,user_id',
             'password'          => 'required|string|min:8',
             'password_confirm'  => 'required|same:password',
@@ -224,4 +224,30 @@ class RegistrationController extends Controller
         return response()->json(['success' => true,'count'=>$cnt]);
     }
 
+    public function profile_update(Request $request,$user_id){
+        if(auth()->user()->user_id!==$user_id)return view('error');
+    
+        
+        $request->validate([
+            'name'         => 'required|string|max:20',
+            'user_id'      => 'required|string|max:20|unique:users,user_id',
+            'profile'      => 'nullable|string|max:200',
+        ]);
+
+        $user = auth()->user();
+        
+        $user->name = $request->input('name');
+        $user->user_id = $request->input('user_id');
+        $user->profile = $request->input('profile');
+
+        if($request->hasFile('avatar')){
+            $path = $request->file('avatar')->store('avatars','public');
+            $user->icon = $path;
+        }
+
+        $user->save();
+
+        return redirect()->route('users.page', ['user_id' => $user_id]);
+
+    }
 }

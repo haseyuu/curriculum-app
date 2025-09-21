@@ -26,23 +26,8 @@
         width: 100%;
         z-index: 1000;
     }
-    .sidebar {
-        width: 15vw;
-        height: 100vh;
-        position: fixed;
-        top: 56px;
-        left: 0;
-        background-color: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-        padding: 20px 10px;
-    }
-    .content {
-        margin-left: 15vw;
-        margin-top: 56px;
-        padding: 20px;
-    }
     .profile-text {
-    display: -webkit-box;
+        display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
@@ -63,7 +48,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container d-flex justify-content-between align-items-center">
                 <!-- 左側：戻る -->
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand" href="{{ url()->previous() }}">
                     戻る
                 </a>
 
@@ -81,39 +66,48 @@
             <div class="card-body">
                 @yield('content')
             </div>
-            @for($i=0;$i<5;$i++)
+            @foreach($users as $user)
             <div class="card-body">
                 <div class="card p-4 mb-3">
                     <div class="d-flex align-items-center justify-content-between">
                         <!-- アイコン + ユーザー情報 -->
                         <div class="d-flex align-items-start">
                             <!-- ユーザーアイコン -->
-                            <img src="https://via.placeholder.com/150"
-                                class="rounded-circle border"
-                                style="width:80px; height:80px; object-fit:cover;">
+                            <img src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
+                                class="rounded-circle border me-3" 
+                                style="width:100px; height:100px; object-fit:cover;margin-right:1vw;">
 
                             <!-- ユーザー名 / ID / プロフィール -->
                             <div class="ms-3">
-                                <h5 class="mb-1">
-                                    ユーザー名 <small class="text-muted">@user_id</small>
-                                </h5>
+                                <a href="{{ url('/users/' . $user->user_id) }}" class="text-decoration-none text-dark">
+                                    <h5 class="mb-1">
+                                        {{ $user->name }} <small class="text-muted">{{ $user->user_id }}</small>
+                                    </h5>
+                                </a>
                                 <p class="profile-text mb-0">
-                                    ここにプロフィール文が入ります。ここにプロフィール文が入ります。ここにプロフィール文が入ります。ここにプロフィール文が入ります。
+                                    {{$user->profile}}
                                 </p>
                             </div>
                         </div>
 
                         <!-- フォローボタン -->
                         <div>
-                            <button class="btn btn-outline-primary btn-sm">　フォロー　</button>
+                            @if(auth()->id() === $user->id)
+                                <a href="" class="btn btn-outline-secondary">プロフィール編集</a>
+                            @elseif($user->follows->contains(auth()->id()))
+                                <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
+                            @elseif(!$user->follows->contains(auth()->id()))
+                                <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
-            @endfor
+            @endforeach
         </div>
     </div>
 
+    <script src="{{ asset('js/script.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

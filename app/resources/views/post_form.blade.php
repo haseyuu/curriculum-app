@@ -26,7 +26,7 @@
         @endif
         <div class="container border p-3" style="max-width: 600px;">
             <div class="d-flex justify-content-between mb-3">
-                <a href="#" class="btn btn-link">戻る</a>
+                <a href="{{ url()->previous() }}" class="btn btn-link">戻る</a>
                 <button type='submit' class='btn btn-primary w-25 mt-3'>投稿</button>
             </div>
 

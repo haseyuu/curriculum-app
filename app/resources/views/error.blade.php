@@ -7,7 +7,7 @@
                     <div class="card-body">
                         <h6 class='text-center'>無効なアクセスです。</h6>
                         <div class='row justify-content-center'>
-                            <a href="" >元のページへ</a>
+                            <a href="{{ url()->previous() }}" >元のページへ</a>
                         </div>
                     </div>
                 </div>

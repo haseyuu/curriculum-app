@@ -36,10 +36,11 @@
                             @endif
                         </div>
                         <div class="container">
-                            <form id="profileForm" action="#" method="POST" enctype="multipart/form-data">
+                            <form id="profileForm" action="{{route('profile_edit',$user->user_id)}}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                @method('PUT')
                                 <div class="mb-3 text-center position-relative" style="width:150px; margin:auto;">
-                                    <img id="avatarPreview" src="" 
+                                    <img id="avatarPreview" src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
                                         class="rounded-circle border" 
                                         style="width:150px; height:150px; object-fit:cover; cursor:pointer;">
                                     <input type="file" id="avatarInput" name="avatar" accept="image/*" class="d-none">
@@ -50,18 +51,22 @@
                                     </button>
                                 </div>
 
+                                <!-- ユーザー情報 -->
                                 <div class="mb-3">
                                     <label for="name" class="form-label">ユーザー名</label>
-                                    <input type="text" name="name" id="name" value="" class="form-control">
-                                    <label for="name" class="form-label">ユーザーID</label>
-                                    <input type="text" name="name" id="name" value="" class="form-control">
-                                    <label for="name" class="form-label">プロフィール</label>
-                                    <textarea name="name" id="name" value="" class="form-control"></textarea><br>
-                                    <a href="{{route('email_change')}}">メールアドレス変更はこちら</a><br>
-                                    <a href="{{route('email_change')}}">パスワード変更はこちら</a>
+                                    <input type="text" name="name" id="name" value="{{ $user->name }}" class="form-control">
+
+                                    <label for="user_id" class="form-label">ユーザーID</label>
+                                    <input type="text" name="user_id" id="user_id" value="{{ $user->user_id }}" class="form-control">
+
+                                    <label for="profile" class="form-label">プロフィール</label>
+                                    <textarea name="profile" id="profile" class="form-control">{{ $user->profile }}</textarea><br>
+
+                                    <a href="{{ route('resetEmail') }}">パスワード変更はこちら</a>
                                 </div>
+                                
                                 <div class="d-flex justify-content-around mb-3">
-                                    <a href="" class="btn btn-secondary">戻る</a>
+                                    <a href="{{ url('/users/' . $user->user_id) }}" class="btn btn-secondary">戻る</a>
                                     <button type="submit" class="btn btn-primary">更新</button>
                                 </div><br><br><br>
                                 <div class="d-flex justify-content-center mb-3">
@@ -77,73 +82,5 @@
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+<script src="{{ asset('js/script.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script>
-const avatarPreview = document.getElementById('avatarPreview');
-const avatarInput = document.getElementById('avatarInput');
-const cropDoneBtn = document.getElementById('cropDoneBtn');
-const form = document.getElementById('profileForm');
-
-let cropper;
-
-avatarPreview.addEventListener('click', function() {
-    if (!cropper) {
-        avatarInput.click();
-    }
-});
-
-avatarInput.addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(event){
-        avatarPreview.src = event.target.result;
-
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(avatarPreview, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 1,
-        });
-
-        cropDoneBtn.style.display = 'inline-block'; // 完了ボタン表示
-    };
-    reader.readAsDataURL(file);
-});
-
-cropDoneBtn.addEventListener('click', function(){
-    if (!cropper) return;
-
-    cropper.getCroppedCanvas().toBlob((blob) => {
-        const file = new File([blob], 'avatar.png', { type: 'image/png' });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        avatarInput.files = dataTransfer.files;
-
-        const url = URL.createObjectURL(blob);
-        avatarPreview.src = url;
-
-        cropper.destroy();
-        cropper = null;
-        cropDoneBtn.style.display = 'none';
-    });
-});
-
-form.addEventListener('submit', function(e){
-    if (cropper) {
-        e.preventDefault();
-        cropper.getCroppedCanvas().toBlob((blob) => {
-            const file = new File([blob], 'avatar.png', { type: 'image/png' });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            avatarInput.files = dataTransfer.files;
-
-            cropper.destroy();
-            cropper = null;
-            cropDoneBtn.style.display = 'none';
-            form.submit();
-        });
-    }
-});
-</script>
