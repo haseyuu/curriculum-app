@@ -27,29 +27,29 @@
                 <div class="card-body">
                     <div class="card-body">
                         <div class="container">
-                            <form id="profileForm" action="#" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="mb-3 text-center position-relative" style="width:150px; margin:auto;">
-                                    <img id="avatarPreview" src="" 
-                                        class="rounded-circle border" 
-                                        style="width:150px; height:150px; object-fit:cover; cursor:pointer;">
-                                </div>
+                            @csrf
+                            <div class="mb-3 text-center position-relative" style="width:150px; margin:auto;">
+                                <img id="avatarPreview" src="{{ auth()->user()->icon ? asset('storage/' . auth()->user()->icon) : asset('default\_icon.png') }}" 
+                                    class="rounded-circle border" 
+                                    style="width:150px; height:150px; object-fit:cover; cursor:pointer;">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">ユーザー名</label><br>
-                                    <label for="name" class="form-label">ユーザーID</label><br>
-                                    <label for="name" class="form-label">メールアドレス</label>
-                                </div>
-                                <div class="d-flex justify-content-center mb-3">
-                                    <a href="{{ url()->previous() }}" class="btn btn-secondary">戻る</a>
-                                </div><br><br><br>
-                                <div class="d-flex justify-content-center mb-3">
-                                <a href="" class="btn btn-danger">アカウント削除</a>
-                                </div>
-                            </form>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">{{ auth()->user()->name }}</label><br>
+                                <label for="name" class="form-label">{{ auth()->user()->user_id }}</label><br>
+                                <label for="name" class="form-label">{{ auth()->user()->email }}</label>
+                            </div>
+                            <div class="d-flex justify-content-center mb-3">
+                                <a href="{{ url()->previous() }}" class="btn btn-secondary">戻る</a>
+                            </div><br><br><br>
+                            <div class="d-flex justify-content-center mb-3">
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-user" data-id="{{ auth()->user()->user_id }}">アカウント削除</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    <script src="{{ asset('js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

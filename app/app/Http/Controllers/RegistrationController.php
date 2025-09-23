@@ -126,16 +126,111 @@ class RegistrationController extends Controller
         return redirect()->route('email_conf')->with('email', $email);
     }
 
+    //メールアドレス再設定用メール送信
+    public function send_change_email(){
+
+        $email = auth()->user()->email;
+        $id = auth()->id();
+
+        // リセット用トークンを生成
+        $token = bin2hex(random_bytes(32));
+
+        // $request->session()->put('reset_token', [
+        //     'email' => $email,
+        //     'token' => $token,
+        // ]);
+
+        DB::table('email_verifications')->insert([
+            'email' => $email,
+            'token' => $token,
+            'user_id' => $id,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        // メール送信
+        Mail::to($email)->send(new AuthMail(
+            'メールアドレス変更用メール',
+            '以下のリンクをクリックして新しいメールアドレスを入力してください。',
+            url('/email/reset?token=' . $token),
+            'メールアドレスを変更する'
+        ));
+
+        return redirect()->route('email_conf')->with('email', $email);
+    }
+
+    //変更メールアドレス認証用メール送信
+    public function send_email(Request $request){
+
+        $email = $request->input('email');
+        $token = $request->input('token');
+
+        $record = DB::table('email_verifications')->where('token', $token)->first();
+        if (!$record) {
+            return redirect()->route('invalid');
+        }
+
+        // リセット用トークンを生成
+        $token = bin2hex(random_bytes(32));
+
+        // $request->session()->put('reset_token', [
+        //     'email' => $email,
+        //     'token' => $token,
+        // ]);
+
+        DB::table('email_verifications')->insert([
+            'email' => $email,
+            'token' => $token,
+            'user_id'=>$record->user_id,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        // メール送信
+        Mail::to($email)->send(new AuthMail(
+            'メールアドレス変更用メール',
+            '以下のリンクをクリックして新しいメールアドレスの認証をしてください。',
+            url('/change/verify?token=' . $token),
+            'メールアドレスを変更する'
+        ));
+
+        return redirect()->route('email_conf')->with('email', $email);
+    }
+
     public function pass_reset(Request $request){
         // 入力バリデーション
         $request->validate([
             'password' => 'required|string|min:8|confirmed',
         ]);
+        // dd($request->password);
         $user = User::where('email', $request->email)->first();
         $user->password = Hash::make($request->password);
         $user->save();
 
-        return view('password.reset_complete');
+        $message = 'パスワード再設定完了しました。';
+
+        return view('password.reset_complete',compact('message'));
+    }
+
+    public function change_email(Request $request){
+        $token = $request->query('token');
+        $record = DB::table('email_verifications')->where('token', $token)->first();
+
+        if (!$record) {
+            return redirect()->route('invalid');
+        }
+
+        // ユーザー更新
+        User::where('id', $record->user_id)->update([
+            'email' => $record->email,
+        ]);
+
+        // 使ったトークン削除
+        DB::table('email_verifications')->where('token', $token)->delete();
+
+        $message = 'メールアドレス変更完了しました。';
+
+        return view('password.reset_complete',compact('message'));
     }
 
     public function follow($id){
@@ -249,5 +344,11 @@ class RegistrationController extends Controller
 
         return redirect()->route('users.page', ['user_id' => $user_id]);
 
+    }
+
+    public function user_delete($user_id){
+        $user = User::where('user_id',$user_id)->first();
+        $user->delete();
+        return view('user.login');
     }
 }

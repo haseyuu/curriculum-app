@@ -15,7 +15,7 @@ class CreateEmailVerificationsTable extends Migration
     {
         Schema::create('email_verifications', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('token')->unique();
             $table->timestamps();
         });

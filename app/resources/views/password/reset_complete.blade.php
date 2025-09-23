@@ -5,7 +5,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-body">
-                        <h6 class='text-center'>パスワード再設定完了しました。</h6>
+                        <h6 class='text-center'>{{$message}}</h6>
                         <div class='row justify-content-center'>
                             <a href="{{ route('login') }}" >ログイン画面へ</a>
                         </div>

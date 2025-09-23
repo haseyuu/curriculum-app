@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- 投稿 / いいね切り替え (user_page 用) ---
     if (btnPosts && btnLikes && postsList && likesList) {
         btnPosts.addEventListener('click', () => {
-            alert('post');
+            // alert('post');
             postsList.style.display = 'block';
             likesList.style.display = 'none';
         });
 
         btnLikes.addEventListener('click', () => {
-            alert('favo');
+            // alert('favo');
             postsList.style.display = 'none';
             likesList.style.display = 'block';
         });
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const btn = e.target;
             const id = btn.dataset.id;
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            alert('test');
+            // alert('test');
             if (btn.dataset.liked=='0') {
                 fetch(`/favo/${id}`, {
                     method: 'POST',
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.count);
+                        // alert(data.count);
                         btn.dataset.liked='1';
                         btn.textContent='★';
                         btn.nextElementSibling.textContent = data.count;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.count);
+                        // alert(data.count);
                         btn.dataset.liked='0';
                         btn.textContent='☆';
                         btn.nextElementSibling.textContent = data.count;
@@ -236,64 +236,98 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-    avatarPreview.addEventListener('click', function() {
-        if (!cropper) {
-            avatarInput.click();
-        }
-    });
 
-    avatarInput.addEventListener('change', function(e){
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(event){
-            avatarPreview.src = event.target.result;
-
-            if (cropper) cropper.destroy();
-            cropper = new Cropper(avatarPreview, {
-                aspectRatio: 1,
-                viewMode: 1,
-                autoCropArea: 1,
-            });
-
-            cropDoneBtn.style.display = 'inline-block'; // 完了ボタン表示
-        };
-        reader.readAsDataURL(file);
-    });
-
-    cropDoneBtn.addEventListener('click', function(){
-        if (!cropper) return;
-
-        cropper.getCroppedCanvas().toBlob((blob) => {
-            const file = new File([blob], 'avatar.png', { type: 'image/png' });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            avatarInput.files = dataTransfer.files;
-
-            const url = URL.createObjectURL(blob);
-            avatarPreview.src = url;
-
-            cropper.destroy();
-            cropper = null;
-            cropDoneBtn.style.display = 'none';
+    if(avatarPreview){
+        avatarPreview.addEventListener('click', function() {
+            if (!cropper) {
+                avatarInput.click();
+            }
         });
-    });
+    }
+    
+    if(avatarInput){
+        avatarInput.addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if (!file) return;
 
-    form.addEventListener('submit', function(e){
-        if (cropper) {
-            e.preventDefault();
+            const reader = new FileReader();
+            reader.onload = function(event){
+                avatarPreview.src = event.target.result;
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(avatarPreview, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                });
+
+                cropDoneBtn.style.display = 'inline-block'; // 完了ボタン表示
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    if(cropDoneBtn){
+        cropDoneBtn.addEventListener('click', function(){
+            if (!cropper) return;
+
             cropper.getCroppedCanvas().toBlob((blob) => {
                 const file = new File([blob], 'avatar.png', { type: 'image/png' });
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 avatarInput.files = dataTransfer.files;
 
+                const url = URL.createObjectURL(blob);
+                avatarPreview.src = url;
+
                 cropper.destroy();
                 cropper = null;
                 cropDoneBtn.style.display = 'none';
-                form.submit();
             });
+        });
+    }
+    
+    if(form){
+        form.addEventListener('submit', function(e){
+            if (cropper) {
+                e.preventDefault();
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    const file = new File([blob], 'avatar.png', { type: 'image/png' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    avatarInput.files = dataTransfer.files;
+
+                    cropper.destroy();
+                    cropper = null;
+                    cropDoneBtn.style.display = 'none';
+                    form.submit();
+                });
+            }
+        });
+    }
+      
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.btn-delete-user')) {
+            e.preventDefault();
+            const btn = e.target;
+            const id = btn.dataset.id;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            if(!confirm('本当に削除しますか？'))return;
+            fetch(`/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => console.error(err));
         }
     });
 

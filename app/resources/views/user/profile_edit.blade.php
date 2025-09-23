@@ -62,7 +62,8 @@
                                     <label for="profile" class="form-label">プロフィール</label>
                                     <textarea name="profile" id="profile" class="form-control">{{ $user->profile }}</textarea><br>
 
-                                    <a href="{{ route('resetEmail') }}">パスワード変更はこちら</a>
+                                    <a href="{{ route('resetEmail') }}">パスワード変更はこちら</a><br>
+                                    <a href="{{ route('chngeEmail') }}">メールアドレス変更はこちら</a>
                                 </div>
                                 
                                 <div class="d-flex justify-content-around mb-3">
@@ -70,7 +71,7 @@
                                     <button type="submit" class="btn btn-primary">更新</button>
                                 </div><br><br><br>
                                 <div class="d-flex justify-content-center mb-3">
-                                <a href="" class="btn btn-danger">アカウント削除</a>
+                                <a href="{{ route('user_delete') }}" class="btn btn-danger">アカウント削除</a>
                                 </div>
                             </form>
                         </div>

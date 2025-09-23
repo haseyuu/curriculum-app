@@ -19,6 +19,7 @@
                         </div>
                         <form action="{{ route($mode) }}" method="post">
                             @csrf
+                            <input type="hidden" name="token" value="{{ $token??'' }}">
                             <input type="email" class='form-control' name='email'
                                 value="{{old('email'?? '')}}" placeholder="メールアドレス"><br>
                             <div class='row justify-content-center'>

@@ -63,6 +63,14 @@ class DisplayController extends Controller
         return view('email.email_form', compact('mode', 'headtxt'));
     }
 
+    public function change_email_form(Request $request){
+        $token = $request->query('token');
+        $mode = 'change_conf';
+        $headtxt = 'メールアドレス変更用認証';
+
+        return view('email.email_form', compact('mode', 'headtxt','token'));
+    }
+
     public function login(Request $request){
         $request->validate([
             'user_info' => 'required|string',
@@ -70,14 +78,18 @@ class DisplayController extends Controller
         ]);
 
         // ユーザーをメールアドレスかuser_idで検索
-        $user = User::where('email', $request->user_info)
+        $user = User::withTrashed()
+                    ->where('email', $request->user_info)
                     ->orWhere('user_id', $request->user_info)
                     ->first();
 
-        if (!$user && Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors([
                 'user_info' => 'メールアドレス/ユーザーID またはパスワードが正しくありません。',
             ]);
+        }
+        if ($user->trashed()) {
+            $user->restore();
         }
         if($user->state<2){
             Auth::login($user);

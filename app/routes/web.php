@@ -44,6 +44,16 @@ Route::middleware('auth')->group(function () {
     //プロフィール編集
     Route::get('/profile/{user_id}', [DisplayController::class, 'profile_edit_view'])->name('profile_edit');
     Route::put('/profile/{user_id}', [RegistrationController::class, 'profile_update'])->name('profile_edit');
+    
+    //メールアドレス変更
+    Route::get('/change/email', [RegistrationController::class, 'send_change_email'])->name('chngeEmail');
+    
+    //ユーザー削除
+    Route::delete('/delete/{user_id}', [RegistrationController::class, 'user_delete'])->name('user_delete');
+
+    Route::get('/users/delete', function () {
+        return view('user.user_delete');
+    })->name('user_delete');
 
 });
 
@@ -61,11 +71,16 @@ Route::get('/register/email', [DisplayController::class, 'regist_email_form'])->
 //認証用メール送信
 Route::post('/register/email', [RegistrationController::class, 'send_regist_email'])->name('regist_conf');
 Route::post('/passreset/email', [RegistrationController::class, 'send_reset_email'])->name('reset_conf');
+Route::post('/change/email', [RegistrationController::class, 'send_email'])->name('change_conf');
 
 //新規登録用メール内リンク
 Route::get('/register/verify', [DisplayController::class, 'regist_form'])->name('register');
 //パスワード再設定用メール内リンク
 Route::get('/password/reset', [DisplayController::class, 'reset_form'])->name('reset');
+//メールアドレス変更用メール内リンク
+Route::get('/email/reset', [DisplayController::class, 'change_email_form'])->name('change_form');
+//メールアドレス変更用メール内リンク
+Route::get('/change/verify', [RegistrationController::class, 'change_email'])->name('change');
 
 //登録内容確認/新規登録
 Route::post('/register/confirm', [registrationController::class, 'confirm'])->name('regist_confirm');
