@@ -33,6 +33,11 @@
                         <div class='row justify-content-center'>
                             <a href="{{ route('registEmail') }}">新規登録はこちら</a>
                         </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ route('login.google') }}" class="btn btn-danger w-100">
+                                Googleでログイン
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class DisplayController extends Controller
 {
@@ -136,20 +137,45 @@ class DisplayController extends Controller
     public function search(Request $request){
         $word = $request->input('search_word','');
         
-        $user = auth()->user();
+        $authuser = auth()->user();
 
         if (!$word) {
             $posts = null;
-            return view('search', compact('posts'));
+            $users = null;
+            return view('search', compact('posts', 'users'));
         }
 
-        $posts = Post::visibleAll($user)
-            ->where('comment', 'like', "%{$word}%")
-            ->latest()
-            ->paginate(2)
-            ->appends(['search_word'=>$word]);
+        if (strpos($word, '@') === 0) {
+            $keyword = ltrim($word, '@');
 
-        return view('search', compact('posts'));
+            $users = User::where('user_id', 'like', "%{$keyword}%")
+                        ->paginate(1)
+                        ->appends(['search_word' => $word]);
+
+            $posts = null;
+        } else {
+            $users = null;
+
+            $posts = Post::with('user')
+                ->whereHas('user', function($q) {
+                    $q->whereNull('deleted_at');
+                })
+                ->visibleAll($authuser)
+                ->where('comment', 'like', "%{$word}%")
+                ->latest()
+                ->paginate(1)
+                ->appends(['search_word' => $word]);
+        }
+        if ($request->ajax()) {
+            if ($posts) {
+                return view('layouts.posts', compact('posts'))->render();
+            }
+            if ($users) {
+                return view('layouts.users', compact('users'))->render();
+            }
+        }
+
+        return view('search', compact('posts', 'users'));
     }
 
     public function follows_view($user_id){
@@ -167,4 +193,25 @@ class DisplayController extends Controller
         $user = User::where('user_id',$user_id)->first();
         return view('user.profile_edit',compact('user'));
     }
+
+    public function redirect_to_Google(){
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handle_Google_callback(){
+        $googleUser = Socialite::driver('google')->user();
+
+        // ユーザーが存在しなければ作成
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->getEmail()],
+            ['name' => 'googleユーザー',
+            'password' => bcrypt(Str::random(16)),
+            'user_id' => Str::random(25)]
+        );
+
+        Auth::login($user);
+
+        return redirect('/');
+    }
 }
+

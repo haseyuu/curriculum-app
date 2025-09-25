@@ -55,6 +55,9 @@ Route::middleware('auth')->group(function () {
         return view('user.user_delete');
     })->name('user_delete');
 
+    //検索
+    Route::get('/search',[DisplayController::class, 'search'])->name('search');
+
 });
 
 Route::get('/login', function () {
@@ -102,9 +105,6 @@ Route::get('/email/invalid', function () {
 Route::get('/follows/{user_id}',[DisplayController::class, 'follows_view'])->name('follows');
 Route::get('/followers/{user_id}',[DisplayController::class, 'followers_view'])->name('followers');
 
-//検索
-// Route::get('/search',[DisplayController::class, 'search_page'])->name('view_search');
-Route::get('/search',[DisplayController::class, 'search'])->name('search');
 
 //ユーザーページ
 Route::get('/users/{user_id}', [DisplayController::class, 'page'])->name('users.page');
@@ -114,3 +114,6 @@ Route::get('/users/{user_id}/posts', [DisplayController::class, 'getPosts'])
     ->name('users.posts');
 Route::get('/users/{user_id}/likes', [DisplayController::class, 'getLikes'])
     ->name('users.likes');
+
+Route::get('auth/google', [DisplayController::class, 'redirect_to_Google'])->name('login.google');
+Route::get('auth/google/callback', [DisplayController::class, 'handle_Google_callback']);
