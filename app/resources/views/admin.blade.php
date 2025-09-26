@@ -37,7 +37,6 @@
         padding: 20px 10px;
     }
     .content {
-        margin-left: 15vw;
         margin-top: 56px;
         padding: 20px;
     }
@@ -49,13 +48,13 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container d-flex justify-content-between align-items-center">
                 <!-- 左側：戻る -->
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand" href="{{ url('/login') }}">
                     戻る
                 </a>
 
                 <!-- 中央：ユーザー名 -->
                 <div class="mx-auto">
-                    <p class="mb-0 fw-bold">ユーザー名</p>
+                    <p class="mb-0 fw-bold">管理者用ユーザー検索画面</p>
                 </div>
 
                 <!-- 空要素で中央寄せ -->
@@ -65,32 +64,45 @@
 
         <div class="content">
             <div class="d-flex justify-content-center mb-3">
-                <form action="" method="post" class="w-50">
-                    @csrf
+                <form action="{{ route('admin_search') }}" method="get" class="w-50">
                     <div class="input-group">
-                        <input type="text" name="search_word" class="form-control" placeholder="ユーザーIDを入力">
+                        <input type="text" name="search_word" class="form-control" placeholder="ユーザーIDや日付を入力" value="{{ $word ?? '' }}">
                         <button class="btn btn-secondary" type="submit">検索</button>
                     </div>
                 </form>
             </div>
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th scope='col'>ユーザーID</th>
-                        <th scope='col'>投稿数</th>
-                        <th scope='col'>削除日付</th>
-                        <th scope='col'>詳細</th>
-                    </tr>
-                </thead>
-                <tbody>
-            @for($i=0;$i<5;$i++)
-                <tr>
-                    <th scope='col'>ユーザーID</th>
-                    <th scope='col'>投稿数</th>
-                    <th scope='col'>2025-09-0{{$i+1}}</th>
-                    <th scope='col'>aaaa</th>
-                </tr
-            @endfor
+
+            @if($users)
+                @if($users->count()==0)
+                    <p class="text-center">検索結果はありません</p>
+                @endif
+
+                <table class='table'>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ユーザーID</th>
+                            <th>ユーザーステータス</th>
+                            <th>投稿数</th>
+                            <th>削除日付</th>
+                            <th>詳細</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->user_id }}</td>
+                            <td>{{ $user->state ?? 'ー' }}</td>
+                            <td>{{ $user->posts()->count() }}</td>
+                            <td>{{ $user->deleted_at ? $user->deleted_at->format('Y-m-d') : '' }}</td>
+                            <td><a href="{{ url('/users/' . $user->user_id) }}">詳細</a></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+                
         </div>
     </div>
 

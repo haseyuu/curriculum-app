@@ -4,7 +4,7 @@
         <form action="search" method="get" class="w-50">
             @csrf
             <div class="input-group">
-                <input type="text" name="search_word" class="form-control" placeholder="検索ワードを入力">
+                <input type="text" name="search_word" class="form-control" placeholder="検索ワードを入力" value="{{ $word ?? '' }}">
                 <button class="btn btn-secondary" type="submit">検索</button>
             </div>
         </form>

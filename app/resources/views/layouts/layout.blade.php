@@ -48,7 +48,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand mx-auto" href="{{ url('/') }}">
+                <a class="navbar-brand mx-auto" href="#">
                     test
                 </a>
             </div>
@@ -58,7 +58,7 @@
             <h4 class="text-center">メニュー</h4>
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ url('/posts') }}" class="nav-link">投稿一覧</a></li>
+                <li class="nav-item"><a href="{{ route('posting') }}" class="nav-link">投稿一覧</a></li>
                 <li class="nav-item"><a href="{{ url('/tags') }}" class="nav-link">タグ</a></li>
                 <li class="nav-item"><a href="{{ url('/favorites') }}" class="nav-link">お気に入り</a></li>
             </ul>

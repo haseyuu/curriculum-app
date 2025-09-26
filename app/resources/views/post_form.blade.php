@@ -26,7 +26,8 @@
         @endif
         <div class="container border p-3" style="max-width: 600px;">
             <div class="d-flex justify-content-between mb-3">
-                <a href="{{ url()->previous() }}" class="btn btn-link">戻る</a>
+                <a href="{{ $previousUrl ?? url()->previous() }}" class="btn btn-link">戻る</a>
+                <input type="hidden" name="previousUrl" value="{{ $previousUrl ?? url()->previous() }}">
                 <button type='submit' class='btn btn-primary w-25 mt-3'>投稿</button>
             </div>
 
@@ -56,25 +57,46 @@
             </div>
 
             <div class="form-group mb-3">
-                <label for="scope">投稿範囲</label>
+                <label for="scope">公開範囲</label>
                 <select id="scope" name="visibility" class="form-control">
                     <option value=0 {{ (old('visibility', $post->visibility ?? 0) == 0) ? 'selected' : '' }}>全体</option>
                     <option value=1 {{ (old('visibility', $post->visibility ?? 0) == 1) ? 'selected' : '' }}>相互フォローのみ</option>
                     <option value=2 {{ (old('visibility', $post->visibility ?? 0) == 2) ? 'selected' : '' }}>非公開(自分のみ閲覧可)</option>
                 </select>
             </div>
+            <div class="form-group mb-3">
+                <label for="reserve">公開予約時間</label>
+                <input type="datetime-local" id="reserve" name="reserve"
+                    class="form-control"
+                    value="{{ old('reserve', isset($post->reserve) ? \Carbon\Carbon::parse($post->reserve)->format('Y-m-d\TH:i') : '') }}">
+            </div>
         </div>
     </form>
 </main>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const textarea = document.getElementById('content');
+    const charCount = document.getElementById('charCount');
+    const maxLength = textarea.getAttribute('maxlength');
+
+    function updateCharCount() {
+        const remaining = maxLength - textarea.value.length;
+        charCount.textContent = `残り${remaining}文字`;
+    }
+
+    // 初期表示
+    updateCharCount();
+
+    // 入力ごとに更新
+    textarea.addEventListener('input', updateCharCount);
+});
     let selectedFiles = [];
 
     // 既存画像を削除する
     function removeExistingImage(btn, imageId) {
         // 親要素を削除
         btn.parentElement.remove();
-        // hidden input も削除されるので、フォーム送信時に除外される
     }
 
     function previewImages(event) {

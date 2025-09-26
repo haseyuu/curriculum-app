@@ -46,7 +46,7 @@
 
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand mx-auto" href="{{ url('/') }}">test</a>
+        <a class="navbar-brand mx-auto" href="#">mono</a>
     </div>
 </nav>
 <div class='content'>

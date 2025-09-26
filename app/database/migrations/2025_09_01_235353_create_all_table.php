@@ -25,20 +25,20 @@ class CreateAllTable extends Migration
             $table->string('comment')->nullable();
             $table->datetime('reserve')->nullable();
             $table->integer('visibility');
-            $table->bigInteger('reply_id')->nullable();
+            // $table->bigInteger('reply_id')->nullable();
             $table->timestamps();
         });
-        Schema::create('tags', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('tag');
-            $table->timestamps();
-        });
-        Schema::create('posts_tags', function (Blueprint $table) {
-            $table->bigInteger('post_id');
-            $table->bigInteger('tag_id');
-            $table->timestamps();
-            $table->primary(['post_id', 'tag_id']);
-        });
+        // Schema::create('tags', function (Blueprint $table) {
+        //     $table->bigIncrements('id');
+        //     $table->string('tag');
+        //     $table->timestamps();
+        // });
+        // Schema::create('posts_tags', function (Blueprint $table) {
+        //     $table->bigInteger('post_id');
+        //     $table->bigInteger('tag_id');
+        //     $table->timestamps();
+        //     $table->primary(['post_id', 'tag_id']);
+        // });
         Schema::create('images', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('post_id');

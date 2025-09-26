@@ -54,7 +54,7 @@
 
                 <!-- 中央：ユーザー名 -->
                 <div class="mx-auto">
-                    <p class="mb-0 fw-bold">ユーザー名</p>
+                    <p class="mb-0 fw-bold">{{$name}}</p>
                 </div>
 
                 <!-- 右側（空の要素で中央寄せを維持） -->

@@ -15,23 +15,13 @@ use App\Http\Controllers\PostController;
 |
 */
 
-Route::get('admin', function () {
-    return view('admin');
-    //return view('welcome');
-})->name('admin');
-
-
-
-
 Route::middleware('auth')->group(function () {
     //投稿/編集画面
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
-    Route::get('posting', function () {
-        return view('post_form');
-    })->name('posting');
+    Route::get('/posts/create',[PostController::class, 'create'])->name('posting');
 
     //フォロー/アンフォロー
     Route::post('/user/{id}', [RegistrationController::class, 'follow'])->name('user.follow');
@@ -58,6 +48,13 @@ Route::middleware('auth')->group(function () {
     //検索
     Route::get('/search',[DisplayController::class, 'search'])->name('search');
 
+    Route::get('/admin', function () {
+        $users = collect();
+        $word = '';
+        return view('admin', compact('users', 'word'));
+    })->name('admin');
+
+    Route::get('/admin/search',[DisplayController::class, 'admin_search'])->name('admin_search');
 });
 
 Route::get('/login', function () {

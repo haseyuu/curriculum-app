@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Post;
 use App\Image;
 use Illuminate\Http\Request;
@@ -20,16 +21,15 @@ class PostController extends Controller
             'images.*'   => 'image|mimes:jpeg,png,jpg,gif|max:4096',
             'reserve'    => 'nullable|date',
             'visibility' => 'required|in:0,1,2',
-            'reply_id'   => 'nullable|exists:posts,id',
         ]);
-
         // 投稿の作成
         $post = Post::create([
             'user_id'    => auth()->id(),
             'comment'    => $validated['comment'],
-            'reserve'    => $validated['reserve'] ?? null,
+            'reserve'    => $request->filled('reserve')
+                        ? Carbon::createFromFormat('Y-m-d\TH:i', $request->reserve)
+                        : null,
             'visibility' => $validated['visibility'],
-            'reply_id'   => $validated['reply_id'] ?? null,
         ]);
 
         // 画像保存
@@ -43,17 +43,20 @@ class PostController extends Controller
             }
         }
 
-        return response()->json([
-            'message' => '投稿が作成されました',
-            'post' => $post->load('images'),
-        ], 201);
+        return redirect($request->input('previousUrl', '/'))
+       ->with('success', '投稿を作成しました');
     }
 
-    public function edit(Post $post){
+    public function edit(Post $post,Request $request){
         // 自分の投稿か確認
         $this->authorize('update', $post);
+        $previousUrl = url()->previous();
 
-        return view('post_form', ['post' => $post]);
+        return view('post_form', ['post' => $post,'previousUrl' => $previousUrl]);
+    }
+    public function create(Request $request){
+        $previousUrl = url()->previous();
+        return view('post_form',['previousUrl' => $previousUrl]);
     }
 
     public function update(Request $request, Post $post){
@@ -63,6 +66,7 @@ class PostController extends Controller
             'comment' => 'required|string|max:200',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'visibility' => 'required|in:0,1,2',
+            'reserve'          => 'nullable|date',
             'existing_images' => 'array', // 既存画像保持用
             'existing_images.*' => 'integer|exists:images,id'
         ]);
@@ -70,6 +74,9 @@ class PostController extends Controller
         $post->update([
             'comment' => $request->comment,
             'visibility' => $request->visibility,
+            'reserve'    => $request->filled('reserve')
+                        ? Carbon::createFromFormat('Y-m-d\TH:i', $request->reserve)
+                        : null,
         ]);
 
         // --- 既存画像の削除 ---
@@ -90,8 +97,8 @@ class PostController extends Controller
             }
         }
 
-        return redirect()->route('users.page', $post->user->user_id)
-                        ->with('success', '投稿を更新しました');
+        return redirect($request->input('previousUrl', '/'))
+       ->with('success', '投稿を作成しました');
     }
 
     public function delete(Post $post){

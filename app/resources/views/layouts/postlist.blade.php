@@ -48,20 +48,24 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand mx-auto" href="{{ url('/') }}">
-                    test
+                <a class="navbar-brand mx-auto" href="#">
+                    mono
                 </a>
             </div>
         </nav>
        <div id="app">
         <div class="sidebar">
+            @if(auth()->id()<>1)
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="{{ url('/users/' . auth()->user()->user_id) }}" class="nav-link">マイページ</a></li>
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ url('/posting') }}" class="nav-link">投稿</a></li>
+                <li class="nav-item"><a href="{{ route('posting') }}" class="nav-link">投稿</a></li>
                 <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>
                 <li class="nav-item"><a href="{{ url('/login') }}" class="nav-link">ログアウト</a></li>
             </ul>
+            @elseif(auth()->id()==1)
+                <a href="{{route('admin')}}">戻る</a>
+            @endif
         </div>
 
         <div class="content">

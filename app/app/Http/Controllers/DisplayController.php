@@ -92,10 +92,10 @@ class DisplayController extends Controller
         if ($user->trashed()) {
             $user->restore();
         }
-        if($user->state<2){
+        if($user->state<3){
             Auth::login($user);
             return redirect()->intended('/');
-        }else if($user->state==2){
+        }else if($user->id==1){
             Auth::login($user);
             return redirect()->intended('admin');
         }
@@ -136,7 +136,6 @@ class DisplayController extends Controller
 
     public function search(Request $request){
         $word = $request->input('search_word','');
-        
         $authuser = auth()->user();
 
         if (!$word) {
@@ -154,17 +153,20 @@ class DisplayController extends Controller
 
             $posts = null;
         } else {
+        // dd($word);
             $users = null;
 
             $posts = Post::with('user')
-                ->whereHas('user', function($q) {
-                    $q->whereNull('deleted_at');
-                })
-                ->visibleAll($authuser)
-                ->where('comment', 'like', "%{$word}%")
-                ->latest()
-                ->paginate(1)
-                ->appends(['search_word' => $word]);
+            ->whereHas('user', function($q) {
+                $q->whereNull('deleted_at');
+            })
+            ->where(function($query) use ($authuser, $word) {
+                $query->visibleAll($authuser)
+                    ->where('comment', 'like', "%{$word}%");
+            })
+            ->latest()
+            ->paginate(1)
+            ->appends(['search_word' => $word]);
         }
         if ($request->ajax()) {
             if ($posts) {
@@ -175,17 +177,53 @@ class DisplayController extends Controller
             }
         }
 
-        return view('search', compact('posts', 'users'));
+        return view('search', compact('posts', 'users','word'));
+    }
+
+    public function admin_search(Request $request){
+        $authuser = auth()->user();
+
+        // 管理者チェック
+        if (!$authuser || $authuser->id != 1) {
+            return view('error');
+        }
+
+        $word = $request->input('search_word', '');
+        // dd($word);
+        $query = User::query()->withTrashed();
+        $users = collect(); // デフォルトで空コレクション
+
+        if ($word === '') {
+            // 空なら表示なし（$usersは空コレクション）
+        } elseif ($word === '0') {
+            // 0なら全件表示
+            $users = $query->get();
+        } elseif (ctype_digit($word)) {
+            // 数字のみならIDで完全一致検索
+            $users = $query->where('id', $word)->get();
+        } elseif (str_starts_with($word, '@')) {
+            // @で始まる場合はuser_idで部分一致
+            $keyword = ltrim($word, '@');
+            $users = $query->where('user_id', 'like', "%{$keyword}%")->get();
+        } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $word)) {
+            // yyyy-mm-dd形式ならdeleted_atでそれ以前を検索
+            $users = $query->whereDate('deleted_at', '<=', $word)->get();
+        }
+
+        // Blade に常に $users を渡す
+        return view('admin', compact('users', 'word'));
     }
 
     public function follows_view($user_id){
+        $name = User::where('user_id',$user_id)->value('name');
         $users = User::where('user_id',$user_id)->first()->follows;
-        return view('user.follows',compact('users'));
+        return view('user.follows',compact('users','name'));
     }
 
     public function followers_view($user_id){
+        $name = User::where('user_id',$user_id)->value('name');
         $users = User::where('user_id',$user_id)->first()->followers;
-        return view('user.follows',compact('users'));
+        return view('user.follows',compact('users','name'));
     }
 
     public function profile_edit_view($user_id){
@@ -201,13 +239,22 @@ class DisplayController extends Controller
     public function handle_Google_callback(){
         $googleUser = Socialite::driver('google')->user();
 
-        // ユーザーが存在しなければ作成
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            ['name' => 'googleユーザー',
-            'password' => bcrypt(Str::random(16)),
-            'user_id' => Str::random(25)]
-        );
+        $user = User::withTrashed()->where('email', $googleUser->getEmail())->first();
+
+        if ($user) {
+            // ソフトデリートされていたら復元
+            if ($user->trashed()) {
+                $user->restore();
+            }
+        } else {
+            // 見つからなければ新規作成
+            $user = User::create([
+                'email'    => $googleUser->getEmail(),
+                'name'     => $googleUser->getName() ?? 'Googleユーザー',
+                'password' => bcrypt(Str::random(16)),
+                'user_id'  => Str::random(25),
+            ]);
+        }
 
         Auth::login($user);
 
