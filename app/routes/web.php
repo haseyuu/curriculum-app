@@ -3,6 +3,7 @@
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\PostController;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 |--------------------------------------------------------------------------

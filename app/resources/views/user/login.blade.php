@@ -23,8 +23,7 @@
                                 <input type="text" class='form-control' name='user_info'
                                 value="{{old('user_info'?? '')}}">
                             <label for="user_info" class='mt-2'>パスワード</label>
-                                <input type="password" class='form-control' name='password'
-                                value="{{old('password'?? '')}}">
+                                <input type="password" class='form-control' name='password'>
                             <a href="{{route('resetEmail')}}">パスワードを忘れた方はこちら</a><br>
                             <div class='row justify-content-center'>
                                 <button type='submit' class='btn btn-primary w-25 mt-3'>ログイン</button>

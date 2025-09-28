@@ -15,12 +15,14 @@
                 </div>
             </div>
             <div>
-                @if(auth()->id() === $user->id)
-                    <a href="{{ url('/profile/' . $user->user_id) }}" class="btn btn-outline-secondary">プロフィール編集</a>
-                @elseif($user->follows->contains(auth()->id()))
-                    <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
-                @elseif(!$user->follows->contains(auth()->id()))
-                    <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
+                @if(auth()->id())
+                    @if(auth()->id() === $user->id)
+                        <a href="{{ url('/profile/' . $user->user_id) }}" class="btn btn-outline-secondary">プロフィール編集</a>
+                    @elseif($user->follows->contains(auth()->id()))
+                        <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
+                    @elseif(!$user->follows->contains(auth()->id()))
+                        <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
+                    @endif
                 @endif
             </div>
         </div>
@@ -81,10 +83,14 @@
                         @endforeach
                     </div>
                     @endif
-                    @if($post->likedByUsers->contains(auth()->id()))
-                        <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                    @if(auth()->id())
+                        @if($post->likedByUsers->contains(auth()->id()))
+                            <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                        @else
+                            <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="0" style="cursor:pointer;">☆</span>
+                        @endif
                     @else
-                        <span class="btn-favo text-warning" data-id="{{ $post->id }}" data-liked="0" style="cursor:pointer;">☆</span>
+                        <span class="btn-favo text-warning" style="cursor:pointer;">★</span>
                     @endif
                     <span class="favo-count">{{ $post->likedByUsers()->count() }}</span>
                 </div>
@@ -118,10 +124,15 @@
                         @endforeach
                     </div>
                     @endif
-                    @if($like->likedByUsers->contains(auth()->id()))
-                        <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                    
+                    @if(auth()->id())
+                        @if($like->likedByUsers->contains(auth()->id()))
+                            <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="1" style="cursor:pointer;">★</span>
+                        @else
+                            <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="0" style="cursor:pointer;">☆</span>
+                        @endif
                     @else
-                        <span class="btn-favo text-warning" data-id="{{ $like->id }}" data-liked="0" style="cursor:pointer;">☆</span>
+                        <span class="btn-favo text-warning" style="cursor:pointer;">★</span>
                     @endif
                     <span class="favo-count">{{ $like->likedByUsers()->count() }}</span>
                 </div>

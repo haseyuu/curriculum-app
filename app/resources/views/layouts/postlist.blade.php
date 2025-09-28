@@ -55,7 +55,7 @@
         </nav>
        <div id="app">
         <div class="sidebar">
-            @if(auth()->id()<>1)
+            @if(auth()->id()<>1&&auth()->id())
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="{{ url('/users/' . auth()->user()->user_id) }}" class="nav-link">マイページ</a></li>
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
@@ -65,6 +65,8 @@
             </ul>
             @elseif(auth()->id()==1)
                 <a href="{{route('admin')}}">戻る</a>
+            @else
+                <li class="nav-item"><a href="{{ url('/login') }}" class="nav-link">ログイン</a></li>  
             @endif
         </div>
 

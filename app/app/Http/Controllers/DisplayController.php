@@ -109,16 +109,18 @@ class DisplayController extends Controller
         $posts = Post::with('user', 'images')
                 ->visibleTo($user)
                 ->latest()
-                ->paginate(2);
+                ->paginate(5);
                 // ->get();
         return view('main', compact('posts'));
     }
 
     public function page($user_id){
         $user = User::where('user_id', $user_id)->firstOrFail();
+        // dd($user);
+        if(!$user) return response()->view('error', [], 404);
 
         // 投稿一覧
-        $posts = $user->posts()->with('images', 'user')->latest()->paginate(2);
+        $posts = $user->posts()->with('images', 'user')->latest()->paginate(5);
 
         // いいね一覧
         $likes = Post::whereIn('id', $user->favorites()->pluck('post_id'))
@@ -148,7 +150,7 @@ class DisplayController extends Controller
             $keyword = ltrim($word, '@');
 
             $users = User::where('user_id', 'like', "%{$keyword}%")
-                        ->paginate(1)
+                        ->paginate(5)
                         ->appends(['search_word' => $word]);
 
             $posts = null;
@@ -165,7 +167,7 @@ class DisplayController extends Controller
                     ->where('comment', 'like', "%{$word}%");
             })
             ->latest()
-            ->paginate(1)
+            ->paginate(5)
             ->appends(['search_word' => $word]);
         }
         if ($request->ajax()) {
@@ -191,10 +193,10 @@ class DisplayController extends Controller
         $word = $request->input('search_word', '');
         // dd($word);
         $query = User::query()->withTrashed();
-        $users = collect(); // デフォルトで空コレクション
+        $users = collect();
 
         if ($word === '') {
-            // 空なら表示なし（$usersは空コレクション）
+            // 空なら表示なし
         } elseif ($word === '0') {
             // 0なら全件表示
             $users = $query->get();

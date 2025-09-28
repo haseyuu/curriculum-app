@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * 投稿を保存する
-     */
+    //投稿を保存する
     public function store(Request $request){
         // バリデーション
         $validated = $request->validate([
@@ -35,13 +33,15 @@ class PostController extends Controller
         // 画像保存
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                $path = $file->store('posts', 'public'); // storage/app/public/posts に保存
+                $path = $file->store('posts', 'public');
                 Image::create([
                     'post_id' => $post->id,
                     'image'   => $path,
                 ]);
             }
         }
+
+        session()->forget('previousUrl');
 
         return redirect($request->input('previousUrl', '/'))
        ->with('success', '投稿を作成しました');
@@ -50,13 +50,23 @@ class PostController extends Controller
     public function edit(Post $post,Request $request){
         // 自分の投稿か確認
         $this->authorize('update', $post);
-        $previousUrl = url()->previous();
+        if (!session()->has('previousUrl')) {
+            session(['previousUrl' => url()->previous()]);
+        }
 
-        return view('post_form', ['post' => $post,'previousUrl' => $previousUrl]);
+        return view('post_form', [
+            'previousUrl' => session('previousUrl')
+        ]);
     }
+    
     public function create(Request $request){
-        $previousUrl = url()->previous();
-        return view('post_form',['previousUrl' => $previousUrl]);
+        if (!session()->has('previousUrl')) {
+            session(['previousUrl' => url()->previous()]);
+        }
+
+        return view('post_form', [
+            'previousUrl' => session('previousUrl')
+        ]);
     }
 
     public function update(Request $request, Post $post){
@@ -90,12 +100,14 @@ class PostController extends Controller
         // --- 新規画像の保存 ---
         if($request->hasFile('images')){
             foreach($request->file('images') as $file){
-                $path = $file->store('public/posts');
+                $path = $file->store('posts','public');
                 $post->images()->create([
                     'image' => str_replace('public/', '', $path)
                 ]);
             }
         }
+
+        session()->forget('previousUrl');
 
         return redirect($request->input('previousUrl', '/'))
        ->with('success', '投稿を作成しました');

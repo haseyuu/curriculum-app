@@ -19,6 +19,16 @@
     @yield('stylesheet')
 </head>
 <main class="py-4">
+    
+    <div class ='panel-body'>
+        @if($errors->any())
+        <div class="alert alert-danger">
+            @foreach($errors->all() as $message)
+            <p>{{ $message }}</p>
+            @endforeach
+        </div>
+        @endif
+    </div>
     <form action="{{ isset($post) ? route('posts.update', $post->id) : route('posts.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
         @if(isset($post))

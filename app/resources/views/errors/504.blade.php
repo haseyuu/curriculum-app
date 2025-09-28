@@ -5,9 +5,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-body">
-                        <h6 class='text-center'>無効なリンクです。<br>再度メールアドレスの登録を行ってください。</h6>
+                        <h6 class='text-center'>もう一度お試しください。</h6>
                         <div class='row justify-content-center'>
-                            <a href="{{route('login')}}" >ログイン画面へ</a>
+                            <a href="{{ url()->previous() }}" >元のページへ</a>
                         </div>
                     </div>
                 </div>
