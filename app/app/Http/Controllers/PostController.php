@@ -55,6 +55,7 @@ class PostController extends Controller
         }
 
         return view('post_form', [
+            'post'=>$post,
             'previousUrl' => session('previousUrl')
         ]);
     }
