@@ -59,7 +59,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="{{ url('/users/' . auth()->user()->user_id) }}" class="nav-link">マイページ</a></li>
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link">ホーム</a></li>
-                <li class="nav-item"><a href="{{ route('posting') }}" class="nav-link">投稿</a></li>
+                <li class="nav-item"><a href="{{ route('posts.create') }}" class="nav-link">投稿</a></li>
                 <li class="nav-item"><a href="{{ url('/search') }}" class="nav-link">検索</a></li>
                 <li class="nav-item"><a href="{{ url('/login') }}" class="nav-link">ログアウト</a></li>
             </ul>

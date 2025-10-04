@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Post;
 use App\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -73,14 +74,24 @@ class PostController extends Controller
     public function update(Request $request, Post $post){
         $this->authorize('update', $post);
 
-        $request->validate([
-            'comment' => 'required|string|max:200',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        $hasExistingImages = $post->images()
+            ->whereNotIn('id', $request->input('deleted_images', []))
+            ->exists();
+
+        $rules = [
+            'comment'    => 'nullable|string|max:500',
+            'images'     => 'nullable|array|max:4',
+            'images.*'   => 'image|mimes:jpeg,png,jpg,gif|max:4096',
+            'reserve'    => 'nullable|date',
             'visibility' => 'required|in:0,1,2',
-            'reserve'          => 'nullable|date',
-            'existing_images' => 'array', // 既存画像保持用
-            'existing_images.*' => 'integer|exists:images,id'
-        ]);
+        ];
+
+        if (!$hasExistingImages) {
+            $rules['comment'] .= '|required_without:images';
+            $rules['images']  .= '|required_without:comment';
+        }
+
+        $validated = $request->validate($rules);
 
         $post->update([
             'comment' => $request->comment,
@@ -90,21 +101,22 @@ class PostController extends Controller
                         : null,
         ]);
 
-        // --- 既存画像の削除 ---
-        $existingIds = $request->input('existing_images', []); // フォームで残った画像ID
-        $post->images()->whereNotIn('id', $existingIds)->each(function($img){
-            // ストレージから削除
-            \Storage::delete('public/'.$img->image);
-            $img->delete();
-        });
+        // 削除フラグのついた既存画像を消す
+        if ($request->has('deleted_images')) {
+            foreach ($request->deleted_images as $imageId) {
+                $image = $post->images()->find($imageId);
+                if ($image) {
+                    Storage::delete('public/' . $image->image);
+                    $image->delete();
+                }
+            }
+        }
 
-        // --- 新規画像の保存 ---
-        if($request->hasFile('images')){
-            foreach($request->file('images') as $file){
-                $path = $file->store('posts','public');
-                $post->images()->create([
-                    'image' => str_replace('public/', '', $path)
-                ]);
+        // 新規画像を保存
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('posts', 'public');
+                $post->images()->create(['image' => $path]);
             }
         }
 
@@ -120,9 +132,30 @@ class PostController extends Controller
             abort(403, '権限がありません');
         }
 
-        // 画像削除（必要なら）
         foreach ($post->images as $image) {
             Storage::delete('public/' . $image->image);
+            $image->delete();
+        }
+
+        $post->delete();
+
+        // Ajax なら JSON を返す
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', '投稿を削除しました');
+    }
+
+    public function destroy(Post $post){
+        // 投稿の所有者かチェック
+        if (auth()->id() !== $post->user_id) {
+            abort(403, '権限がありません');
+        }
+
+        foreach ($post->images as $image) {
+            Storage::delete('public/' . $image->image);
+            $image->delete();
         }
 
         $post->delete();

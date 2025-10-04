@@ -34,10 +34,12 @@
 
                         <!-- フォローボタン -->
                         <div>
-                            @if($user->follows->contains(auth()->id()))
-                                <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
-                            @elseif(!$user->follows->contains(auth()->id()))
-                                <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
+                            @if(auth()->user()->user_id<>$user->user_id)
+                                @if(auth()->user()->follows->contains('id', $user->id))
+                                    <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
+                                @elseif(!auth()->user()->follows->contains('id', $user->id))
+                                    <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
+                                @endif
                             @endif
                         </div>
                     </div>

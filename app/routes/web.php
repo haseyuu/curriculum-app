@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\RegistrationController;
-use App\Http\Controllers\PostController;
 use Symfony\Component\HttpFoundation\Response;
 
 /*
@@ -18,11 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 Route::middleware('auth')->group(function () {
     //投稿/編集画面
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
-    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
-    Route::get('/posts/create',[PostController::class, 'create'])->name('posting');
+    Route::resource('posts', PostController::class)->except(['index', 'show']);
+    // Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    // Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    // Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    // Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
+    // Route::get('/posts/create',[PostController::class, 'create'])->name('posting');
 
     //フォロー/アンフォロー
     Route::post('/user/{id}', [RegistrationController::class, 'follow'])->name('user.follow');
@@ -85,6 +85,7 @@ Route::get('/change/verify', [RegistrationController::class, 'change_email'])->n
 
 //登録内容確認/新規登録
 Route::post('/register/confirm', [registrationController::class, 'confirm'])->name('regist_confirm');
+Route::get('/register/back', [DisplayController::class, 'back'])->name('register_back');
 Route::post('/register/store', [registrationController::class, 'create_user'])->name('regist_complete');
 
 //パスワード再設定

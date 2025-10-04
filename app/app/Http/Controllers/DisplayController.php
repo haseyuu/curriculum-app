@@ -35,6 +35,15 @@ class DisplayController extends Controller
         return view('registration.regist_form', compact('email', 'token'));
     }
 
+    public function back(Request $request){
+        $data = $request->session()->get('registration', []);
+        $token = $request->session()->get('register_token.token');
+        $email = $data['email'] ?? $request->session()->get('verified_email');
+
+        return redirect()->to('/register/verify?token='.$token)
+                        ->withInput($data);
+    }
+
     public function reset_form(Request $request){
         $token = $request->query('token'); 
 
@@ -115,15 +124,20 @@ class DisplayController extends Controller
     }
 
     public function page($user_id){
+        $authuser = auth()->user();
         $user = User::where('user_id', $user_id)->firstOrFail();
         // dd($user);
         if(!$user) return response()->view('error', [], 404);
 
         // 投稿一覧
-        $posts = $user->posts()->with('images', 'user')->latest()->paginate(5);
+        $posts = $user->posts()->with('images', 'user')
+                    ->visibleAll($authuser)              
+                    ->latest()
+                    ->paginate(5);
 
         // いいね一覧
         $likes = Post::whereIn('id', $user->favorites()->pluck('post_id'))
+                    ->visibleAll($authuser)            
                     ->with('images', 'user')
                     ->latest()
                     ->paginate(10);
@@ -217,14 +231,18 @@ class DisplayController extends Controller
     }
 
     public function follows_view($user_id){
-        $name = User::where('user_id',$user_id)->value('name');
-        $users = User::where('user_id',$user_id)->first()->follows;
+        $user = User::where('user_id', $user_id)->firstOrFail();
+        $name = $user->name;
+
+        $users = $user->follows()->paginate(5);
         return view('user.follows',compact('users','name'));
     }
 
     public function followers_view($user_id){
-        $name = User::where('user_id',$user_id)->value('name');
-        $users = User::where('user_id',$user_id)->first()->followers;
+        $user = User::where('user_id', $user_id)->firstOrFail();
+        $name = $user->name;
+
+        $users = $user->followers()->paginate(5);
         return view('user.follows',compact('users','name'));
     }
 
@@ -252,7 +270,7 @@ class DisplayController extends Controller
             // 見つからなければ新規作成
             $user = User::create([
                 'email'    => $googleUser->getEmail(),
-                'name'     => $googleUser->getName() ?? 'Googleユーザー',
+                'name'     => 'Googleユーザー',
                 'password' => bcrypt(Str::random(16)),
                 'user_id'  => Str::random(25),
             ]);

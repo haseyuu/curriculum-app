@@ -40,7 +40,7 @@
                 </form>
 
                 <div class="row justify-content-center mt-3">
-                    <a href="{{ route('register') }}" class="btn btn-secondary w-25">戻る</a>
+                    <a href="{{ route('register_back') }}" class="btn btn-secondary w-25">戻る</a>
                 </div>
             </div>
         </div>

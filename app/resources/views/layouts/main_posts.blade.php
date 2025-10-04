@@ -1,8 +1,9 @@
-@extends('layouts.postlist')
-@section('content')
+@if($posts)
+    @if($posts->count() == 0)
+    <h5>表示できる投稿はありません</h5>
+    @endif
     <div id="posts-container" style='margin-top:1vw;'>
-    @include('layouts.main_posts', ['posts' => $posts])    
-    <!-- @foreach($posts as $post)
+        @foreach($posts as $post)
         <div class="card mb-3 p-3">
             <div class="d-flex align-items-start mb-2">
                 <a href="{{ url('/users/' . $post->user->user_id) }}">
@@ -38,7 +39,10 @@
             @endif
             <span class="favo-count">{{ $post->likedByUsers()->count() }}</span>
         </div>
-        @endforeach -->
+        @endforeach
     </div>
-       
-@endsection
+    @if($posts->hasMorePages())
+    <button id="load-more" data-next-page="{{ $posts->nextPageUrl() }}" class="btn btn-primary mt-3">もっと見る</button>
+    @endif
+
+@endif

@@ -349,6 +349,6 @@ class RegistrationController extends Controller
     public function user_delete($user_id){
         $user = User::where('user_id',$user_id)->first();
         $user->delete();
-        return view('user.login');
+        return response()->json(['success' => true, 'redirect' => route('login')]);
     }
 }

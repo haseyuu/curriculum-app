@@ -40,6 +40,10 @@
     .btn{
         white-space: nowrap;
     }
+    .content {
+        margin-top: 56px;
+        padding: 20px;
+    }
 </style>
     @yield('stylesheet')
 </head>
@@ -63,47 +67,7 @@
         </nav>
 
         <div class="content">
-            <div class="card-body">
-                @yield('content')
-            </div>
-            @foreach($users as $user)
-            <div class="card-body">
-                <div class="card p-4 mb-3">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <!-- アイコン + ユーザー情報 -->
-                        <div class="d-flex align-items-start">
-                            <!-- ユーザーアイコン -->
-                            <img src="{{ $user->icon ? asset('storage/' . $user->icon) : asset('default\_icon.png') }}" 
-                                class="rounded-circle border me-3" 
-                                style="width:100px; height:100px; object-fit:cover;margin-right:1vw;">
-
-                            <!-- ユーザー名 / ID / プロフィール -->
-                            <div class="ms-3">
-                                <a href="{{ url('/users/' . $user->user_id) }}" class="text-decoration-none text-dark">
-                                    <h5 class="mb-1">
-                                        {{ $user->name }} <small class="text-muted">{{ $user->user_id }}</small>
-                                    </h5>
-                                </a>
-                                <p class="profile-text mb-0">
-                                    {{$user->profile}}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- フォローボタン -->
-                        <div>
-                            @if(auth()->id())
-                                @if($user->follows->contains(auth()->id()))
-                                    <button class="btn btn-outline-primary" id="btn-follow" value='0' data-id="{{ $user->id }}">フォロー解除</button>
-                                @elseif(!$user->follows->contains(auth()->id()))
-                                    <button class="btn btn-outline-primary" id="btn-follow" value='1' data-id="{{ $user->id }}">フォローする</button>
-                                @endif
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
+            @include('layouts.users',['users'=>$users])
         </div>
     </div>
 

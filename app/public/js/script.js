@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(err => console.error(err));
 
             } else {
-                if (!confirm('本当にフォローしますか？')) return;
+                // if (!confirm('本当にフォローしますか？')) return;
                 
                 fetch(`/user/${id}`, {
                     method: 'POST',
@@ -323,6 +323,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        // alert(data.redirect);
+                        window.location.href = data.redirect;
                     } else {
                         alert(data.message);
                     }

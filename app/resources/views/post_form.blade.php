@@ -51,16 +51,15 @@
                 <input type="file" id="images" name="images[]" class="form-control-file" accept="image/*" multiple onchange="previewImages(event)">
 
                 <div id="previewArea" class="mt-2 d-flex flex-wrap">
-                    {{-- 既存画像の表示 --}}
                     @if(isset($post) && $post->images)
                         @foreach($post->images as $image)
-                        <div class="position-relative m-2">
-                            <img src="{{ asset('storage/' . $image->image) }}" class="img-thumbnail" style="max-width:150px;">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute"
-                                    style="top:0; right:0; transform: translate(50%,-50%); border-radius:50%;"
-                                    onclick="removeExistingImage(this, {{ $image->id }})">×</button>
-                            <input type="hidden" name="existing_images[]" value="{{ $image->id }}">
-                        </div>
+                            <div class="position-relative m-2 existing-image" data-id="{{ $image->id }}">
+                                <img src="{{ asset('storage/' . $image->image) }}" class="img-thumbnail" style="max-width:150px;">
+                                <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                        style="top:0; right:0; transform: translate(50%,-50%); border-radius:50%;"
+                                        onclick="removeExistingImage({{ $image->id }}, this)">×</button>
+                                <input type="hidden" name="existing_images[]" value="{{ $image->id }}">
+                            </div>
                         @endforeach
                     @endif
                 </div>
@@ -86,21 +85,21 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const textarea = document.getElementById('content');
-    const charCount = document.getElementById('charCount');
-    const maxLength = textarea.getAttribute('maxlength');
+        const textarea = document.getElementById('content');
+        const charCount = document.getElementById('charCount');
+        const maxLength = textarea.getAttribute('maxlength');
 
-    function updateCharCount() {
-        const remaining = maxLength - textarea.value.length;
-        charCount.textContent = `残り${remaining}文字`;
-    }
+        function updateCharCount() {
+            const remaining = maxLength - textarea.value.length;
+            charCount.textContent = `残り${remaining}文字`;
+        }
 
-    // 初期表示
-    updateCharCount();
+        // 初期表示
+        updateCharCount();
 
-    // 入力ごとに更新
-    textarea.addEventListener('input', updateCharCount);
-});
+        // 入力ごとに更新
+        textarea.addEventListener('input', updateCharCount);
+    });
     let selectedFiles = [];
 
     // 既存画像を削除する
@@ -109,63 +108,83 @@
         btn.parentElement.remove();
     }
 
-    function previewImages(event) {
-        const files = Array.from(event.target.files);
+    function removeExistingImage(imageId, btn) {
+    const wrapper = btn.parentElement;
+    wrapper.remove();
 
-        if (selectedFiles.length + files.length > 4) {
-            alert("画像は最大4枚までです。");
-            return;
+    // 「削除した画像ID」を hidden で送信
+    const deletedInput = document.createElement("input");
+    deletedInput.type = "hidden";
+    deletedInput.name = "deleted_images[]";
+    deletedInput.value = imageId;
+    document.querySelector("form").appendChild(deletedInput);
+}
+
+// 新規画像をプレビュー
+function previewImages(event) {
+    const newFiles = Array.from(event.target.files);
+
+    newFiles.forEach(file => {
+        if (selectedFiles.length < 4) {
+            selectedFiles.push(file);
         }
+    });
 
-        files.forEach(file => {
-            if (selectedFiles.length < 4) {
-                selectedFiles.push(file);
-            }
-        });
+    renderPreviews();
 
-        renderPreviews();
-    }
+    // input.files を更新
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    document.getElementById('images').files = dt.files;
+}
 
-    function renderPreviews() {
-        const previewArea = document.getElementById('previewArea');
+function renderPreviews() {
+    const previewArea = document.getElementById('previewArea');
 
-        // 既存画像は残す
-        const existing = Array.from(previewArea.querySelectorAll('input[name="existing_images[]"]')).map(el => el.parentElement);
-        previewArea.innerHTML = '';
-        existing.forEach(el => previewArea.appendChild(el));
+    // 既存画像は残す
+    const existing = Array.from(previewArea.querySelectorAll('.existing-image'));
+    previewArea.innerHTML = '';
+    existing.forEach(el => previewArea.appendChild(el));
 
-        selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const wrapper = document.createElement('div');
-                wrapper.classList.add("position-relative", "m-2");
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add("img-thumbnail");
-                img.style.maxWidth = "150px";
+    selectedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add("position-relative", "m-2");
 
-                const removeBtn = document.createElement('button');
-                removeBtn.textContent = "×";
-                removeBtn.classList.add("btn", "btn-danger", "btn-sm", "position-absolute");
-                removeBtn.style.top = "0";
-                removeBtn.style.right = "0";
-                removeBtn.style.transform = "translate(50%,-50%)";
-                removeBtn.style.borderRadius = "50%";
-                removeBtn.addEventListener('click', () => {
-                    removeImage(index);
-                });
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add("img-thumbnail");
+            img.style.maxWidth = "150px";
 
-                wrapper.appendChild(img);
-                wrapper.appendChild(removeBtn);
-                previewArea.appendChild(wrapper);
-            }
-            reader.readAsDataURL(file);
-        });
-    }
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = "×";
+            removeBtn.type = "button";
+            removeBtn.classList.add("btn", "btn-danger", "btn-sm", "position-absolute");
+            removeBtn.style.top = "0";
+            removeBtn.style.right = "0";
+            removeBtn.style.transform = "translate(50%,-50%)";
+            removeBtn.style.borderRadius = "50%";
 
-    function removeImage(index) {
-        selectedFiles.splice(index, 1);
-        renderPreviews();
-    }
+            removeBtn.addEventListener('click', () => {
+                removeImage(index);
+            });
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            previewArea.appendChild(wrapper);
+        }
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    renderPreviews();
+
+    // input.files を更新
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    document.getElementById('images').files = dt.files;
+}
 </script>

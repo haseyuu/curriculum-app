@@ -18,6 +18,16 @@ class Post extends Model
         'reserve',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($post) {
+            foreach ($post->images as $image) {
+                Storage::delete('public/' . $image->image);
+                $image->delete();
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault()
